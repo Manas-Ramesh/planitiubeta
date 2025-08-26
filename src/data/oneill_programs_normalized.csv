@@ -1,0 +1,41 @@
+school,program_code,program_name,degree_type,catalog_year,cip_code,min_total_credits,min_residency_credits,min_gpa,delivery,campus,notes
+O’Neill School of Public and Environmental Affairs,ONEILL-SUSTAINABILITYPROGRA,Sustainability (Program),BS,2025-2026,,,,,in-person,IUB,Parsed from sustainability.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-HEALTHCAREMANAGEMENT,Healthcare Management and Policy (B.S.),BS,2025-2026,,,,,in-person,IUB,Parsed from healthcare.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-PUBLICAFFAIRSCORE,Public Affairs Core,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ENVIRONMENTALMANAGEM,Environmental Management Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-HUMANRESOURCEMANAGEM,Human Resource Management Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-LAWANDPUBLICPOLICYMA,Law and Public Policy Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-MANAGEMENTMAJOR,Management Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-FIVEOFTHEFOLLOWINGMA,Five of the following Major courses:,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-NOTETHESECOURSESAREG,"Note: These courses are grouped by topic to assist students, but students are free to take any combination of them. Courses may appear in more than one list. Courses cannot double count between Analytical, Human Resource Management, and Major courses.",BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-NONPROFITMANAGEMENTA,Nonprofit Management and Leadership Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-POLICYANALYSISMAJOR,Policy Analysis Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-PUBLICFINANCIALMANAG,Public Financial Management Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-PUBLICMANAGEMENTANDL,Public Management and Leadership Major,BS,2025-2026,,,,,in-person,IUB,Parsed from publicaffairs.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ENVIRONMENTALSCIENCE,Environmental Science (B.S.E.S.),BSES,2025-2026,,,,,in-person,IUB,Parsed from envisci.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ARTSMANAGEMENTBS,Arts Management (B.S.),BS,2025-2026,,,,,in-person,IUB,Parsed from artsmgmt.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ARTSMANAGEMENTMINOR,Arts Management Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-EDUCATIONPOLICYMINOR,Education Policy Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ENVIRONMENTALANDSUST,Environmental and Sustainability Studies Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-JOINTMINORWITHSPEAAN,Joint minor with SPEA and College of Arts and Sciences.,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-JOINTMINORWITHONEILL,Joint minor with O'Neill and College of Arts and Sciences.,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-HOMELANDSECURITYMINO,Homeland Security Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-INFORMATIONSYSTEMSMI,Information Systems Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-LAWANDPUBLICPOLICYMI,Law and Public Policy Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-POLICYSTUDIESMINOR,Policy Studies Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-PUBLICANDENVIRONMENT,Public and Environmental Affairs Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-THISMINORISFORNONONE,This minor is for non-O'Neill students only.,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-URBANPLANNINGANDCOMM,Urban Planning and Community Development Minor,Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-WATERRESOURCESSCIENC,"Water Resources Science, Policy, and Management Minor",Minor,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-STUDENTSCANONLYGETCR,* students can only get credit for one of SPEA-E 355 or SPEA-E 455 toward the minor,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-ATLEAST9CREDITHOURSI,At least 9 credit hours in the minor must be completed at the 300–400 level.,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-THEGRADEPOINTAVERAGE,The grade point average of all courses taken in the minor must be equal or greater to 2.000.,BS,2025-2026,,,,,in-person,IUB,Parsed from minors.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-SPEASTUDENTSCANNOTEA,SPEA students cannot earn a certificate in the same area as their major.,BS,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINAPPLIED,Certificate in Applied Research and Inquiry,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEREQUIREME,Certificate Requirements,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINARTSADM,Certificate in Arts Administration,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINNONPROF,Certificate in Nonprofit Management and Leadership,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-THISCERTIFICATEISFOR,This certificate is for non-O’Neill students only.,BS,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINHEALTHC,Certificate in Healthcare Management and Policy,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINPUBLICM,Certificate in Public Management and Leadership,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt
+O’Neill School of Public and Environmental Affairs,ONEILL-CERTIFICATEINURBANST,Certificate in Urban Studies,Certificate,2025-2026,,,,,in-person,IUB,Parsed from certificates.txt

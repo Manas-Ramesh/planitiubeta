@@ -1,4 +1,4 @@
-// Data processing utilities for Kelley Course App
+// Data processing utilities for Course App
 // This file contains functions to process the CSV and JSON data
 
 /**
@@ -66,13 +66,51 @@
   };
   
   /**
+   * Process Luddy requirements JSON to create a structured requirements map
+   * @param {Array} luddyRequirements - Parsed JSON data from luddy_requirements.json
+   * @returns {Object} - Structured requirements by program
+   */
+  export const processLuddyRequirements = (luddyRequirements) => {
+    const requirementsMap = {};
+    
+    luddyRequirements.forEach(req => {
+      const programCode = req.program_code;
+      
+      if (!requirementsMap[programCode]) {
+        requirementsMap[programCode] = {
+          programName: req.program_name,
+          requirements: []
+        };
+      }
+      
+      if (req.children && req.children.length > 0) {
+        const courses = req.children.map(child => child.ref).filter(Boolean);
+        if (courses.length > 0) {
+          requirementsMap[programCode].requirements.push({
+            id: req.node_id,
+            type: req.node_type,
+            title: req.title,
+            description: req.description,
+            courses: courses,
+            ruleType: req['rule.type'],
+            ruleN: req['rule.n']
+          });
+        }
+      }
+    });
+    
+    return requirementsMap;
+  };
+  
+  /**
    * Process course data to create enriched course objects
-   * @param {Array} courseData - Parsed CSV data from kelley_courses_normalized.csv
+   * @param {Array} courseData - Parsed CSV data from courses_normalized.csv
    * @param {Object} gradeMap - Grade data map from processGradeData
    * @param {Array} requirementsMap - Requirements mapping from CSV
+   * @param {string} school - 'kelley' or 'luddy' to determine processing logic
    * @returns {Array} - Array of enriched course objects
    */
-  export const processCourseData = (courseData, gradeMap, requirementsMap) => {
+  export const processCourseData = (courseData, gradeMap, requirementsMap, school = 'kelley') => {
     return courseData.map(course => {
       const courseId = course.course_id;
       const avgGpa = gradeMap[courseId] || 3.0; // Default GPA if not found
@@ -89,28 +127,39 @@
         }
       });
       
-      // Determine difficulty based on level and GPA
+      // Determine difficulty based on level and GPA and school
       let difficulty = 'Beginner';
-      if (level >= 300 || avgGpa < 2.8) {
-        difficulty = 'Advanced';
-      } else if (level >= 200 || avgGpa < 3.2) {
-        difficulty = 'Intermediate';
+      if (school === 'luddy') {
+        // Luddy courses tend to be more rigorous, especially CS and Engineering
+        if (level >= 300 || avgGpa < 2.9) {
+          difficulty = 'Advanced';
+        } else if (level >= 200 || avgGpa < 3.1) {
+          difficulty = 'Intermediate';
+        }
+      } else {
+        // Kelley difficulty mapping
+        if (level >= 300 || avgGpa < 2.8) {
+          difficulty = 'Advanced';
+        } else if (level >= 200 || avgGpa < 3.2) {
+          difficulty = 'Intermediate';
+        }
       }
       
       return {
         id: courseId,
-        title: course.title || extractTitleFromDescription(courseId),
-        description: course.description || `Course in ${course.subject} department`,
+        title: course.title || extractTitleFromDescription(courseId, school),
+        description: course.description || generateDefaultDescription(courseId, school),
         credits: course.credits_min || 3,
         avgGpa: avgGpa,
         difficulty: difficulty,
         professor: course.instructor_name || 'TBD',
-        fulfills: fulfills.length > 0 ? fulfills : ['General Requirement'],
+        fulfills: fulfills.length > 0 ? fulfills : getDefaultFulfills(courseId, school),
         prerequisites: extractPrerequisites(course.prereq_text),
         level: level,
         term: course.term || 'Fall 2025',
         subject: course.subject,
-        catalogNumber: course.catalog_number
+        catalogNumber: course.catalog_number,
+        school: school
       };
     });
   };
@@ -124,7 +173,7 @@
     if (!prereqText) return [];
     
     const prerequisites = [];
-    // Simple regex to match course patterns like "BUS-A 100" or "MATH-M 119"
+    // Enhanced regex to match both Kelley and Luddy course patterns
     const coursePattern = /([A-Z]{2,4}-[A-Z]\s*\d{3})/g;
     const matches = prereqText.match(coursePattern);
     
@@ -140,11 +189,12 @@
   
   /**
    * Extract title from course ID when title is not available
-   * @param {string} courseId - Course ID like "BUS-A100"
+   * @param {string} courseId - Course ID like "BUS-A100" or "CSCI-C211"
+   * @param {string} school - School identifier ('kelley' or 'luddy')
    * @returns {string} - Generated title
    */
-  const extractTitleFromDescription = (courseId) => {
-    const titleMap = {
+  const extractTitleFromDescription = (courseId, school) => {
+    const kelleyTitleMap = {
       'BUS-A': 'Accounting',
       'BUS-F': 'Finance',
       'BUS-M': 'Marketing',
@@ -159,10 +209,80 @@
       'STAT': 'Statistics'
     };
     
+    const luddyTitleMap = {
+      'CSCI': 'Computer Science',
+      'INFO': 'Informatics',
+      'DSCI': 'Data Science',
+      'ENGR': 'Engineering',
+      'MATH': 'Mathematics',
+      'STAT': 'Statistics',
+      'PHYS': 'Physics',
+      'CHEM': 'Chemistry',
+      'BIOL': 'Biology'
+    };
+    
+    const titleMap = school === 'luddy' ? luddyTitleMap : kelleyTitleMap;
+    
     const subject = courseId.split('-')[0];
     const subjectCode = courseId.includes('-') ? courseId.split('-')[0] + '-' + courseId.split('-')[1][0] : subject;
     
-    return titleMap[subjectCode] || titleMap[subject] || 'Business Course';
+    return titleMap[subjectCode] || titleMap[subject] || 
+           (school === 'luddy' ? 'Luddy Course' : 'Business Course');
+  };
+  
+  /**
+   * Generate default description for courses without descriptions
+   * @param {string} courseId - Course ID
+   * @param {string} school - School identifier
+   * @returns {string} - Default description
+   */
+  const generateDefaultDescription = (courseId, school) => {
+    const subject = courseId.split('-')[0];
+    const level = parseInt(courseId.match(/\d{3}/)?.[0] || '100');
+    
+    if (school === 'luddy') {
+      const descriptions = {
+        'CSCI': 'Computer Science course focusing on computational thinking and programming',
+        'INFO': 'Informatics course exploring the intersection of technology and society',
+        'DSCI': 'Data Science course covering data analysis and statistical methods',
+        'ENGR': 'Engineering course applying scientific principles to solve problems'
+      };
+      
+      const baseDesc = descriptions[subject] || 'Luddy School course';
+      
+      if (level >= 400) return `Advanced ${baseDesc.toLowerCase()} with specialized applications`;
+      if (level >= 300) return `Intermediate ${baseDesc.toLowerCase()} with practical applications`;
+      if (level >= 200) return `Foundational ${baseDesc.toLowerCase()} building on core concepts`;
+      return `Introduction to ${baseDesc.toLowerCase()}`;
+    } else {
+      return `Course in ${subject} department focusing on business applications`;
+    }
+  };
+  
+  /**
+   * Get default fulfills array for courses without explicit requirements
+   * @param {string} courseId - Course ID
+   * @param {string} school - School identifier
+   * @returns {Array} - Default fulfills array
+   */
+  const getDefaultFulfills = (courseId, school) => {
+    const subject = courseId.split('-')[0];
+    const level = parseInt(courseId.match(/\d{3}/)?.[0] || '100');
+    
+    if (school === 'luddy') {
+      const luddyFulfills = {
+        'CSCI': level >= 300 ? ['CS Core', 'Major Requirement'] : ['CS Foundation'],
+        'INFO': level >= 300 ? ['Informatics Core', 'Major Requirement'] : ['Informatics Foundation'],
+        'DSCI': level >= 300 ? ['Data Science Core', 'Major Requirement'] : ['Data Science Foundation'],
+        'ENGR': level >= 300 ? ['Engineering Core', 'Major Requirement'] : ['Engineering Foundation'],
+        'MATH': ['Mathematics Requirement'],
+        'STAT': ['Statistics Requirement']
+      };
+      
+      return luddyFulfills[subject] || ['General Requirement'];
+    } else {
+      return ['General Requirement'];
+    }
   };
   
   /**
@@ -175,6 +295,28 @@
    */
   export const calculateCourseScore = (course, userProfile, swipedCourses = [], rejectedCourses = []) => {
     let score = 50; // Base score
+    
+    // School-specific adjustments
+    const isLuddyStudent = isLuddyMajor(userProfile.major);
+    const courseIsLuddy = course.school === 'luddy';
+    const courseIsKelley = course.school === 'kelley';
+    const isGeneralCourse = course.school === 'general';
+    
+    // Complete disqualification for cross-school courses
+    if (isLuddyStudent && courseIsKelley) {
+      return 0; // Luddy students cannot take Kelley courses
+    } else if (!isLuddyStudent && courseIsLuddy) {
+      return 0; // Kelley students cannot take Luddy courses
+    }
+    
+    // School alignment bonuses
+    if (isLuddyStudent && courseIsLuddy) {
+      score += 30; // Strong preference for Luddy courses for Luddy students
+    } else if (!isLuddyStudent && courseIsKelley) {
+      score += 30; // Strong preference for Kelley courses for Kelley students
+    } else if (isGeneralCourse) {
+      score += 10; // General courses are good for everyone
+    }
     
     // GPA difficulty adjustment
     const gpaDiff = course.avgGpa - userProfile.gpa;
@@ -210,9 +352,10 @@
       }
     }
     
-    // Major alignment bonus
+    // Major alignment bonus - enhanced for Luddy
     if (userProfile.major && course.fulfills.some(req => 
-      req.toLowerCase().includes(userProfile.major.toLowerCase())
+      req.toLowerCase().includes(userProfile.major.toLowerCase()) ||
+      (isLuddyStudent && isLuddyCoreRequirement(req, userProfile.major))
     )) {
       score += 15;
     }
@@ -228,6 +371,48 @@
     }
     
     return Math.max(0, Math.min(100, score));
+  };
+  
+  /**
+   * Check if a major is from Luddy school
+   * @param {string} major - Major name
+   * @returns {boolean} - True if Luddy major
+   */
+  const isLuddyMajor = (major) => {
+    if (!major) return false;
+    const luddyMajors = [
+      'computer science', 'cs', 'computer science (b.s.)', 'computer science (b.a.)',
+      'data science', 'data science (b.s.)',
+      'informatics', 'informatics (b.s.)',
+      'intelligent systems engineering', 'ise', 'intelligent systems engineering (b.s.e.)'
+    ];
+    return luddyMajors.some(m => major.toLowerCase().includes(m));
+  };
+  
+  /**
+   * Check if a requirement is a Luddy core requirement for the major
+   * @param {string} req - Requirement name
+   * @param {string} major - Major name
+   * @returns {boolean} - True if it's a core requirement
+   */
+  const isLuddyCoreRequirement = (req, major) => {
+    const reqLower = req.toLowerCase();
+    const majorLower = major.toLowerCase();
+    
+    if (majorLower.includes('computer science') || majorLower.includes('cs')) {
+      return reqLower.includes('cs core') || reqLower.includes('computer science');
+    }
+    if (majorLower.includes('data science')) {
+      return reqLower.includes('data science core') || reqLower.includes('data science');
+    }
+    if (majorLower.includes('informatics')) {
+      return reqLower.includes('informatics core') || reqLower.includes('informatics');
+    }
+    if (majorLower.includes('engineering') || majorLower.includes('ise')) {
+      return reqLower.includes('engineering core') || reqLower.includes('engineering');
+    }
+    
+    return false;
   };
   
   /**
@@ -258,7 +443,8 @@
    * @returns {Object} - Progress information
    */
   export const calculateDegreeProgress = (userProfile, scheduledCourses = [], requirements = {}) => {
-    const totalRequiredCredits = 120; // Standard for Kelley
+    const isLuddy = isLuddyMajor(userProfile.major);
+    const totalRequiredCredits = 120; // Standard for both Kelley and Luddy
     
     // Calculate completed credits
     const completedCredits = userProfile.completedCourses.length * 3; // Assuming 3 credits each
@@ -269,12 +455,104 @@
     const totalCredits = completedCredits + scheduledCredits;
     const percentage = Math.min((totalCredits / totalRequiredCredits) * 100, 100);
     
-    return {
+    // School-specific progress tracking
+    let progressMetrics = {
       percentage: percentage,
       completedCredits: completedCredits,
       scheduledCredits: scheduledCredits,
       totalCredits: totalCredits,
       remainingCredits: Math.max(totalRequiredCredits - totalCredits, 0),
-      onTrack: percentage >= (new Date().getMonth() >= 8 ? 25 : 50) // Rough semester progress
+      onTrack: percentage >= (new Date().getMonth() >= 8 ? 25 : 50)
     };
+    
+    if (isLuddy) {
+      // Add Luddy-specific metrics
+      progressMetrics.majorCredits = calculateMajorCredits(userProfile, scheduledCourses, 'luddy');
+      progressMetrics.residencyCredits = calculateResidencyCredits(userProfile, scheduledCourses, 'luddy');
+      progressMetrics.capstoneComplete = checkCapstoneComplete(userProfile, scheduledCourses, 'luddy');
+    } else {
+      // Add Kelley-specific metrics
+      progressMetrics.icoreEligible = checkIcoreEligibility(userProfile, scheduledCourses);
+      progressMetrics.businessCredits = calculateBusinessCredits(userProfile, scheduledCourses);
+    }
+    
+    return progressMetrics;
+  };
+  
+  /**
+   * Calculate major-specific credits completed/scheduled
+   */
+  const calculateMajorCredits = (userProfile, scheduledCourses, school) => {
+    const allCourses = [...userProfile.completedCourses, ...scheduledCourses.map(c => c.id)];
+    
+    if (school === 'luddy') {
+      const majorPrefixes = getMajorPrefixes(userProfile.major);
+      return allCourses.filter(courseId => 
+        majorPrefixes.some(prefix => courseId.toLowerCase().startsWith(prefix.toLowerCase()))
+      ).length * 3; // Assuming 3 credits each
+    }
+    
+    return 0;
+  };
+  
+  /**
+   * Get course prefixes for a Luddy major
+   */
+  const getMajorPrefixes = (major) => {
+    const majorLower = major.toLowerCase();
+    
+    if (majorLower.includes('computer science')) {
+      return ['CSCI', 'MATH-M', 'MATH-T'];
+    }
+    if (majorLower.includes('data science')) {
+      return ['DSCI', 'CSCI', 'STAT', 'MATH-E'];
+    }
+    if (majorLower.includes('informatics')) {
+      return ['INFO'];
+    }
+    if (majorLower.includes('engineering')) {
+      return ['ENGR', 'MATH-M', 'PHYS'];
+    }
+    
+    return [];
+  };
+  
+  /**
+   * Calculate residency credits (courses taken at IU Bloomington)
+   */
+  const calculateResidencyCredits = (userProfile, scheduledCourses, school) => {
+    // For simplicity, assume all courses in the system are IU Bloomington courses
+    return calculateMajorCredits(userProfile, scheduledCourses, school);
+  };
+  
+  /**
+   * Check if capstone requirements are complete
+   */
+  const checkCapstoneComplete = (userProfile, scheduledCourses, school) => {
+    const allCourses = [...userProfile.completedCourses, ...scheduledCourses.map(c => c.id)];
+    const capstonePatterns = ['Y399', 'Y499', 'D498', 'D499', 'I494', 'I495', 'E490', 'E491'];
+    
+    return allCourses.some(courseId => 
+      capstonePatterns.some(pattern => courseId.includes(pattern))
+    );
+  };
+  
+  /**
+   * Check I-Core eligibility for Kelley students
+   */
+  const checkIcoreEligibility = (userProfile, scheduledCourses) => {
+    const allCourses = [...userProfile.completedCourses, ...scheduledCourses.map(c => c.id)];
+    const icorePrereqs = ['ENG-W131', 'BUS-C104', 'BUS-T175', 'MATH-M119', 'ECON-E370'];
+    
+    return icorePrereqs.every(prereq => 
+      allCourses.some(courseId => courseId.includes(prereq.split('-')[1]))
+    );
+  };
+  
+  /**
+   * Calculate business credits for Kelley students
+   */
+  const calculateBusinessCredits = (userProfile, scheduledCourses) => {
+    const allCourses = [...userProfile.completedCourses, ...scheduledCourses.map(c => c.id)];
+    return allCourses.filter(courseId => courseId.startsWith('BUS')).length * 3;
   };

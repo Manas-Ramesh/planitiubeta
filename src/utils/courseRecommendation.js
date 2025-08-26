@@ -1,5 +1,5 @@
 // Advanced course recommendation algorithms for Course App
-// (Now supports Kelley + Luddy majors in major-alignment scoring)
+// Now supports Kelley + Luddy majors in major-alignment scoring
 
 /**
  * Advanced recommendation engine that considers multiple factors
@@ -33,6 +33,19 @@
    * Calculate the overall advanced score for a single course
    */
   const calculateAdvancedScore = (course, userProfile, swipedCourses, rejectedCourses, gradeData, requirements) => {
+    // School filtering - immediately return 0 for wrong school courses
+    const studentIsLuddy = isLuddyMajor(userProfile.major);
+    const courseIsLuddy = course.school === 'luddy';
+    const courseIsKelley = course.school === 'kelley';
+    const isGeneralCourse = course.school === 'general';
+    
+    // Complete disqualification for cross-school courses
+    if (studentIsLuddy && courseIsKelley) {
+      return 0; // Luddy students cannot take Kelley courses
+    } else if (!studentIsLuddy && courseIsLuddy) {
+      return 0; // Kelley students cannot take Luddy courses
+    }
+  
     const weights = {
       gpaFitness: 0.25,
       levelProgression: 0.15,
@@ -46,6 +59,15 @@
   
     let score = 0;
   
+    // School alignment bonus
+    if (studentIsLuddy && courseIsLuddy) {
+      score += 30; // Bonus for Luddy courses for Luddy students
+    } else if (!studentIsLuddy && courseIsKelley) {
+      score += 30; // Bonus for Kelley courses for Kelley students
+    } else if (isGeneralCourse) {
+      score += 10; // General courses are good for everyone
+    }
+  
     // 1) GPA fit (0-100)
     const gpaScore = calculateGpaFitnessScore(course, userProfile, gradeData);
     score += gpaScore * weights.gpaFitness;
@@ -58,7 +80,7 @@
     const prereqScore = calculatePrerequisiteScore(course, userProfile);
     score += prereqScore * weights.prerequisites;
   
-    // 4) Major alignment (0-100) — updated to include LUDDY
+    // 4) Major alignment (0-100)
     const majorScore = calculateMajorAlignmentScore(course, userProfile);
     score += majorScore * weights.majorAlignment;
   
@@ -74,11 +96,25 @@
     const timeScore = calculateTimeConflictScore(course, swipedCourses);
     score += timeScore * weights.timeConflicts;
   
-    // 8) Diversity (0-100) — encourage variety vs. duplicates
+    // 8) Diversity (0-100)
     const diversityScore = calculateDiversityScore(course, swipedCourses, userProfile);
     score += diversityScore * weights.diversity;
   
     return Math.round(score);
+  };
+  
+  /**
+   * Check if a major is from Luddy school
+   */
+  const isLuddyMajor = (major) => {
+    if (!major) return false;
+    const luddyMajors = [
+      'computer science', 'cs', 'computer science (b.s.)', 'computer science (b.a.)',
+      'data science', 'data science (b.s.)',
+      'informatics', 'informatics (b.s.)',
+      'intelligent systems engineering', 'ise', 'intelligent systems engineering (b.s.e.)'
+    ];
+    return luddyMajors.some(m => major.toLowerCase().includes(m));
   };
   
   /**
@@ -92,7 +128,7 @@
     // Heuristic: if user lists strong completed coursework, reduce dependence on GPA
     const rigorBoost = (userProfile.completedCourses || []).length >= 6 ? 10 : 0;
   
-    // Map 2.5–3.9 GPA to 30–95 baseline
+    // Map 2.5-3.9 GPA to 30-95 baseline
     const clamped = Math.max(2.5, Math.min(3.9, avgGpa));
     const base = 30 + ((clamped - 2.5) / (3.9 - 2.5)) * 65;
   
@@ -104,10 +140,9 @@
    */
   const calculateLevelProgressionScore = (course, userProfile) => {
     const level = course.level || inferLevelFromId(course.id);
-    // naive “current level” proxy: count of completed courses
     const completed = (userProfile.completedCourses || []).length;
   
-    // beginners: prefer 100–200; more experience → okay to climb
+    // beginners: prefer 100-200; more experience → okay to climb
     if (completed <= 4) {
       if (level <= 100) return 95;
       if (level <= 200) return 80;
@@ -135,7 +170,6 @@
   
   /**
    * Prerequisites: if user is missing many listed prereqs, score drops
-   * Expects course.prerequisites as array of strings/ids (already normalized by your data layer)
    */
   const calculatePrerequisiteScore = (course, userProfile) => {
     const prereqs = Array.isArray(course.prerequisites) ? course.prerequisites : [];
@@ -156,7 +190,7 @@
   };
   
   /**
-   * Major alignment: **UPDATED** — adds Luddy majors/subjects mapping
+   * Major alignment: adds Luddy majors/subjects mapping
    */
   const calculateMajorAlignmentScore = (course, userProfile) => {
     const major = (userProfile.major || '').toLowerCase();
@@ -168,17 +202,15 @@
     // Fast-path: if fulfills mentions major or core words, give strong match
     const coreWords = [
       'major core', 'core', 'foundation', 'prereq', 'icore',
-      // Luddy-flavored
-      'cs core', 'informatics core', 'data science core', 'engineering core'
+      'cs core', 'informatics core', 'data science core', 'engineering core', 'luddy core'
     ];
     if (fulfills.some(f => f.includes(major) || coreWords.some(w => f.includes(w)))) {
       return 95;
     }
   
     // Subject prefix mapping
-    // NOTE: Keep these short/lowercase course subject codes for startsWith checks
     const map = {
-      // — Kelley —
+      // Kelley
       'accounting': ['bus-a', 'acct', 'accounting'],
       'finance': ['bus-f', 'fin', 'finance', 'econ'],
       'marketing': ['bus-m', 'mkt', 'marketing'],
@@ -187,15 +219,16 @@
       'supply chain management': ['bus-p', 'ops', 'supply', 'logistics'],
       'business analytics': ['bus-k', 'k', 'stat', 'analytics', 'ds'],
   
-      // — Luddy —
-      // CS (B.S./B.A.) → CSCI-*
-      'computer science': ['csci', 'c', 'p'], // include C/P for tracks like C343/P423 patterns at IU
-      // Data Science → DSCI, STAT, some CSCI
-      'data science': ['dsci', 'stat', 'csci', 'info-i'],
-      // Informatics → INFO-I*
+      // Luddy
+      'computer science': ['csci', 'c', 'p'],
+      'computer science (b.s.)': ['csci', 'c', 'p'],
+      'computer science (b.a.)': ['csci', 'c', 'p'],
+      'data science': ['dsci', 'stat', 'csci', 'info-i', 'math-e'],
+      'data science (b.s.)': ['dsci', 'stat', 'csci', 'info-i', 'math-e'],
       'informatics': ['info-i', 'info'],
-      // Intelligent Systems Engineering → ENGR-E*
-      'intelligent systems engineering': ['engr-e', 'engr']
+      'informatics (b.s.)': ['info-i', 'info'],
+      'intelligent systems engineering': ['engr-e', 'engr'],
+      'intelligent systems engineering (b.s.e.)': ['engr-e', 'engr']
     };
   
     // try exact major keys first
@@ -213,12 +246,12 @@
       if (major.includes('informatic')) {
         if (startsWithAny(subject, map['informatics'])) return 80;
       }
-      if (major.includes('engineering')) {
+      if (major.includes('engineering') || major.includes('intelligent')) {
         if (startsWithAny(subject, map['intelligent systems engineering'])) return 80;
       }
     }
   
-    // still might be relevant if fulfills has any “general/major/prereq/core” hints
+    // still might be relevant if fulfills has any "general/major/prereq/core" hints
     if (fulfills.some(f => ['general', 'prereq', 'core', 'major'].some(w => f.includes(w)))) {
       return 65;
     }
@@ -234,7 +267,11 @@
   const calculateRequirementScore = (course, userProfile, requirements) => {
     if (!course.fulfills || course.fulfills.length === 0) return 30;
   
-    const critical = ['icore prerequisites', 'major core', 'general education', 'cs core', 'informatics core', 'data science core', 'engineering core'];
+    const critical = [
+      'icore prerequisites', 'major core', 'general education', 
+      'cs core', 'informatics core', 'data science core', 'engineering core',
+      'luddy core', 'capstone', 'foundation'
+    ];
     const courseFulfills = course.fulfills.map(f => String(f).toLowerCase());
   
     // If any fulfill string includes a critical token
@@ -345,10 +382,8 @@
   
   /**
    * Lightweight requirement-driven suggestions
-   * (e.g., “show me courses that likely satisfy core for my major”)
    */
   export const getRequirementBasedRecommendations = (courses, userProfile, requirements = {}) => {
-    // Just reuse the advanced engine with empty swipes/rejects for sorted list
     return (courses || [])
       .map(course => ({
         ...course,
@@ -396,7 +431,7 @@
     if (factors.majorRelevance < 50) {
       tips.push('This may not closely align with your major; take it if it meets electives or exploration goals.');
     } else if (factors.majorRelevance >= 80) {
-      tips.push('Great alignment with your major’s core or foundation.');
+      tips.push('Great alignment with your major\'s core or foundation.');
     }
     if (factors.levelAppropriate < 50) {
       tips.push('Pick a course closer to your current level this term.');
@@ -405,4 +440,3 @@
     if (tips.length === 0) tips.push('You appear well-prepared for this course!');
     return tips;
   };
-  
