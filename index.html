@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IU Course Match - Tinder for Classes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: #ffffff;
+            min-height: 100vh;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                border-radius: 20px;
+                margin: 20px auto;
+                min-height: calc(100vh - 40px);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #990000 0%, #cc3333 100%);
+            color: white;
+            padding: 24px 20px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+        
+        .tab-nav {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f3f4;
+            padding: 0 8px;
+            gap: 4px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 16px 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            color: #6b7280;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #990000 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(153, 0, 0, 0.2);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #f9fafb;
+            color: #374151;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 24px 20px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Login Page Styles */
+        .login-form {
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .login-form h2 {
+            margin-bottom: 32px;
+            color: #990000;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        .login-form h3 {
+            margin-bottom: 24px;
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #1f2937;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #990000;
+            box-shadow: 0 0 0 3px rgba(153, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #990000 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(153, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(153, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Swipe Card Styles */
+        .card-stack {
+            position: relative;
+            height: 520px;
+            margin: 20px 16px;
+            perspective: 1000px;
+        }
+        
+        .course-card {
+            position: absolute;
+            width: 100%;
+            height: 500px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            padding: 24px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            z-index: 1;
+            border: 1px solid #f3f4f6;
+        }
+        
+        .course-card:active {
+            cursor: grabbing;
+        }
+        
+        .course-card.dragging {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        
+        .course-card h3 {
+            color: #990000;
+            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        
+        .course-card h4 {
+            color: #4b5563;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .course-details {
+            margin-bottom: 20px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .course-details p {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .course-details p:first-child {
+            margin-top: 0;
+        }
+        
+        .course-details p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .gpa-differential {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 16px;
+            display: inline-block;
+            font-weight: 700;
+            margin: 16px 0;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+        
+        .gpa-explanation {
+            background: #f3f4f6;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            margin: 16px 0;
+            line-height: 1.5;
+            border-left: 3px solid #d1d5db;
+        }
+        
+        .time-slots {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            border: 1px solid #e5e7eb;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .time-slots strong {
+            color: #374151;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .action-buttons {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .reject-btn, .accept-btn {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reject-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .accept-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .reject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .accept-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .reject-btn:active, .accept-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Schedule Calendar Styles */
+        .calendar {
+            display: grid;
+            grid-template-columns: 80px repeat(5, 1fr);
+            gap: 1px;
+            background: #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .calendar-header {
+            background: #990000;
+            color: white;
+            padding: 10px 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .time-slot {
+            background: white;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            border-right: 1px solid #dee2e6;
+        }
+        
+        .calendar-cell {
+            background: white;
+            height: 40px;
+            position: relative;
+            border: 1px solid #f1f3f4;
+        }
+        
+        .course-block {
+            background: #990000;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 10px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        /* Priority Ranking Styles */
+        .priority-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .priority-item {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 12px 0;
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .priority-item:hover {
+            border-color: #990000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .priority-item.dragging {
+            transform: rotate(2deg) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .priority-item strong {
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .priority-item small {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        /* GPA Calculator Styles */
+        .gpa-input {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .gpa-result {
+            background: linear-gradient(45deg, #990000, #cc3333);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        /* Degree Progress Styles */
+        .requirement-section {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .requirement-header {
+            background: #990000;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+        }
+        
+        .requirement-content {
+            padding: 15px;
+        }
+        
+        .requirement-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+        
+        .completed {
+            color: #28a745;
+        }
+        
+        .incomplete {
+            color: #dc3545;
+        }
+        
+        .credit-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #990000 0%, #b91c1c 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            z-index: 100;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(153, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 32px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        
+        .close {
+            color: #9ca3af;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            transition: color 0.2s ease;
+        }
+        
+        .close:hover {
+            color: #374151;
+        }
+
+        .checkbox-group {
+            margin: 16px 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .checkbox-group label:hover {
+            background: #f9fafb;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            accent-color: #990000;
+        }
+
+        .major-search {
+            position: relative;
+        }
+
+        .major-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .major-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        .major-option:hover {
+            background: #f9fafb;
+        }
+        
+        .major-option:last-child {
+            border-bottom: none;
+        }
+
+        .ap-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+
+        .ap-section h4 {
+            color: #990000;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .no-more-cards {
+            text-align: center;
+            padding: 60px 24px;
+            color: #6b7280;
+        }
+        
+        .no-more-cards h3 {
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        .no-more-cards p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .swipe-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .swipe-hint.show {
+            opacity: 1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 24px;
+            color: #6b7280;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #990000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        .loading p {
+            font-size: 16px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>IU Course Match</h1>
+            <div class="subtitle">Find your perfect classes</div>
+        </div>
+        
+        <div class="credit-counter" id="creditCounter" style="display: none;">
+            Credits: <span id="creditCount">0</span>/18
+        </div>
+
+        <!-- Login/Setup Phase -->
+        <div id="setupPhase" class="tab-content active">
+            <div class="login-form">
+                <h2>Welcome to IU Course Match!</h2>
+                <div id="loginStep" class="setup-step">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Enter your IU username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password">
+                    </div>
+                    <button class="btn" onclick="proceedToProfile()">Log In</button>
+                </div>
+
+                <div id="profileStep" class="setup-step" style="display: none;">
+                    <h3>Set Up Your Profile</h3>
+                    <div class="form-group">
+                        <label for="majorSearch">Major</label>
+                        <div class="major-search">
+                            <input type="text" id="majorSearch" placeholder="Search for your major..." 
+                                   oninput="filterMajors()" onfocus="showMajorDropdown()">
+                            <div id="majorDropdown" class="major-dropdown"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gradYear">Expected Graduation Year</label>
+                        <select id="gradYear">
+                            <option value="">Select Year</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Have you taken any AP exams?</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="hasAPs" onchange="toggleAPSections()"> Yes, I have AP credits</label>
+                        </div>
+                    </div>
+
+                    <div id="apSections" style="display: none;">
+                        <div class="ap-section">
+                            <h4>AP Exams with Score of 5</h4>
+                            <div class="checkbox-group" id="ap5s"></div>
+                        </div>
+                        <div class="ap-section">
+                            <h4>AP Exams with Score of 4</h4>
+                            <div class="checkbox-group" id="ap4s"></div>
+                        </div>
+                        <div class="ap-section">
+                            <h4>AP Exams with Score of 3</h4>
+                            <div class="checkbox-group" id="ap3s"></div>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="proceedToPriorities()">Continue</button>
+                </div>
+
+                <div id="priorityStep" class="setup-step" style="display: none;">
+                    <h3>Rank Your Priorities</h3>
+                    <p style="margin-bottom: 20px;">Drag to reorder your preferences for course selection:</p>
+                    <ul class="priority-list" id="priorityList">
+                        <li class="priority-item" data-priority="major_fulfillment">
+                            <strong>Major Fulfillment</strong>
+                            <br><small>Courses that count toward your degree requirements</small>
+                        </li>
+                        <li class="priority-item" data-priority="grade_distribution">
+                            <strong>Grade Distribution</strong>
+                            <br><small>Classes with high percentage of A grades</small>
+                        </li>
+                        <li class="priority-item" data-priority="teacher_rating">
+                            <strong>Teacher Quality</strong>
+                            <br><small>Instructors with positive student feedback</small>
+                        </li>
+                    </ul>
+                    <button class="btn" onclick="startCourseRecommendation()">Start Finding Courses!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Navigation -->
+        <div class="tab-nav" id="mainNav" style="display: none;">
+            <button class="tab-btn active" onclick="showTab('courses')">Courses</button>
+            <button class="tab-btn" onclick="showTab('schedule')">Schedule</button>
+            <button class="tab-btn" onclick="showTab('gpa')">GPA Calc</button>
+            <button class="tab-btn" onclick="showTab('progress')">Progress</button>
+        </div>
+
+        <!-- Course Recommendation Tab -->
+        <div id="courses" class="tab-content">
+            <div class="swipe-hint" id="swipeHint">Swipe right to accept, left to reject</div>
+            <div class="card-stack" id="cardStack">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Finding perfect courses for you...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="schedule" class="tab-content">
+            <h3 style="margin-bottom: 20px;">Your Schedule</h3>
+            <div class="calendar" id="scheduleCalendar">
+                <div class="calendar-header">Time</div>
+                <div class="calendar-header">Mon</div>
+                <div class="calendar-header">Tue</div>
+                <div class="calendar-header">Wed</div>
+                <div class="calendar-header">Thu</div>
+                <div class="calendar-header">Fri</div>
+            </div>
+            <div id="scheduledCourses" style="margin-top: 20px;">
+                <h4>Enrolled Courses:</h4>
+                <div id="courseList"></div>
+            </div>
+        </div>
+
+        <!-- GPA Calculator Tab -->
+        <div id="gpa" class="tab-content">
+            <h3 style="margin-bottom: 20px;">GPA Calculator</h3>
+            <div id="gpaInputs"></div>
+            <button class="btn" onclick="addGPACourse()">Add Course</button>
+            <div class="gpa-result" id="gpaResult">
+                Current GPA: <span id="calculatedGPA">0.00</span>
+            </div>
+        </div>
+
+        <!-- Degree Progress Tab -->
+        <div id="progress" class="tab-content">
+            <h3 style="margin-bottom: 20px;">Degree Progress</h3>
+            <div id="degreeProgress"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = {};
+        let selectedCourses = [];
+        let totalCredits = 0;
+        let courseRecommendations = [];
+        let currentCardIndex = 0;
+        let dragStartX = 0;
+        let isDragging = false;
+
+        // Comprehensive major data
+        const LUDDY_MAJORS = [
+            'Computer Science (B.S.)',
+            'Informatics (B.S.)',
+            'Intelligent Systems Engineering (B.S.)',
+            'Data Science (B.S.)',
+            'Cybersecurity Risk Management (B.S.)',
+            'Media Arts and Science (B.S.)',
+            'Information and Library Science (B.S.)',
+            'Human-Computer Interaction Design (B.S.)',
+            'Bioinformatics (B.S.)',
+            'Complex Systems (B.S.)'
+        ];
+
+        const KELLEY_MAJORS = [
+            'Accounting (B.S.)',
+            'Business Analytics (B.S.)',
+            'Economics (B.S.)',
+            'Entrepreneurship & Corporate Innovation (B.S.)',
+            'Finance (B.S.)',
+            'International Business (B.S.)',
+            'Law, Ethics & Decision-Making (Co-major)',
+            'Management (B.S.)',
+            'Marketing (B.S.)',
+            'Operations Management (B.S.)',
+            'Real Estate (B.S.)',
+            'Supply Chain Management (B.S.)',
+            'Sustainable & Responsible Business (Co-major)',
+            'Technology Management (B.S.)'
+        ];
+
+        const ALL_MAJORS = [...LUDDY_MAJORS, ...KELLEY_MAJORS].sort();
+
+        // AP Exam data with IU credit mapping
+        const AP_EXAMS = {
+            'Art History': { 5: 'ARTH-A 100', 4: 'ARTH-A 100', 3: 'UNDI' },
+            'Biology': { 5: 'BIOL-L 111+L 113', 4: 'BIOL-L 111', 3: 'UNDI' },
+            'Calculus AB': { 5: 'MATH-M 211', 4: 'MATH-M 211', 3: 'MATH UN100' },
+            'Calculus BC': { 5: 'MATH-M 211+M 212', 4: 'MATH-M 211', 3: 'MATH-M 211' },
+            'Chemistry': { 5: 'CHEM-C 117+C 127', 4: 'CHEM-C 105+C 125', 3: 'UNDI' },
+            'Computer Science A': { 5: 'CSCI-A 201', 4: 'CSCI-A 110', 3: 'UNDI' },
+            'Computer Science Principles': { 5: 'CSCI-A 110', 4: 'CSCI-A 110', 3: 'UNDI' },
+            'Economics Macro': { 5: 'ECON-E 201', 4: 'ECON-E 201', 3: 'UNDI' },
+            'Economics Micro': { 5: 'ECON-E 202', 4: 'ECON-E 202', 3: 'UNDI' },
+            'English Language': { 5: 'ENG-W 131EX+L 198', 4: 'ENG-W 131EX+L 198', 3: 'ENG-L 198' },
+            'English Literature': { 5: 'ENG-W 131EX+L 198', 4: 'ENG-W 131EX+L 198', 3: 'ENG-L 198' },
+            'Environmental Science': { 5: 'GEOL-G 107+L 107', 4: 'GEOL-G 107', 3: 'UNDI' },
+            'European History': { 5: 'HIST-H 113+H 114', 4: 'HIST-H 113', 3: 'UNDI' },
+            'French Language': { 5: 'FREN-F 250', 4: 'FREN-F 200', 3: 'FREN-F 100' },
+            'German Language': { 5: 'GER-G 250', 4: 'GER-G 200', 3: 'GER-G 100' },
+            'Government & Politics': { 5: 'POLS-Y 103', 4: 'POLS-Y 103', 3: 'UNDI' },
+            'Human Geography': { 5: 'GEOG-G 110', 4: 'GEOG-G 110', 3: 'UNDI' },
+            'Latin': { 5: 'CLAS-L 250', 4: 'CLAS-L 200', 3: 'CLAS-L 100' },
+            'Music Theory': { 5: 'MUS-T 109+T 111', 4: 'MUS-T 109', 3: 'UNDI' },
+            'Physics 1': { 5: 'PHYS-P 201', 4: 'PHYS-P 201', 3: 'UNDI' },
+            'Physics 2': { 5: 'PHYS-P 202', 4: 'PHYS-P 202', 3: 'UNDI' },
+            'Physics C Mechanics': { 5: 'PHYS-P 221', 4: 'PHYS-P 221', 3: 'UNDI' },
+            'Physics C E&M': { 5: 'PHYS-P 222', 4: 'PHYS-P 222', 3: 'UNDI' },
+            'Psychology': { 5: 'PSY-P 101', 4: 'PSY-P 101', 3: 'UNDI' },
+            'Spanish Language': { 5: 'HISP-S 250', 4: 'HISP-S 200', 3: 'HISP-S 100' },
+            'Statistics': { 5: 'STAT-S 301', 4: 'STAT-S 301', 3: 'UNDI' },
+            'Studio Art 2D': { 5: 'FINA-F 100', 4: 'FINA-F 100', 3: 'UNDI' },
+            'Studio Art 3D': { 5: 'FINA-S 100', 4: 'FINA-S 100', 3: 'UNDI' },
+            'US History': { 5: 'HIST-H 105+H 106', 4: 'HIST-H 105', 3: 'UNDI' },
+            'World History': { 5: 'HIST-H 109+H 110', 4: 'HIST-H 109', 3: 'UNDI' }
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('IU Course Match initialized!');
+            
+            // Load real course data
+            await loadCourseData();
+            
+            initializeMajorDropdown();
+            initializeAPSections();
+            initializePriorityDragDrop();
+            generateScheduleCalendar();
+            
+            // Show keyboard shortcuts hint
+            setTimeout(() => {
+                if (document.getElementById('courses').classList.contains('active')) {
+                    console.log('Tip: Use arrow keys or A/D keys to swipe through courses!');
+                }
+            }, 5000);
+        });
+
+        // Course data loading from actual CSV
+        let allCourseData = [];
+        let fa25Courses = [];
+
+        async function loadCourseData() {
+            try {
+                // Check if we're in Claude.ai artifacts environment
+                if (typeof window.fs !== 'undefined' && window.fs.readFile) {
+                    console.log('Loading actual course data from CSV...');
+                    const csvContent = await window.fs.readFile('master_courses_with_fa25_enriched_all.csv', { encoding: 'utf8' });
+                    
+                    // Parse CSV using Papa Parse
+                    const Papa = await import('https://cdn.skypack.dev/papaparse@5.4.1');
+                    const parsedData = Papa.parse(csvContent, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        delimitersToGuess: [',', '\t', '|', ';']
+                    });
+
+                    allCourseData = parsedData.data;
+                    
+                    // Filter for FA25 courses only
+                    fa25Courses = allCourseData.filter(row => row.term === 'FA25');
+                    
+                    console.log(`Loaded ${fa25Courses.length} FA25 courses from ${allCourseData.length} total courses`);
+                    
+                    // Log sample data structure
+                    if (fa25Courses.length > 0) {
+                        console.log('Sample course data:', fa25Courses[0]);
+                    }
+
+                    return true;
+                } else {
+                    // For regular web deployment, you'd need to upload CSV to server
+                    console.log('File system API not available - using demo data');
+                    console.log('To use real data, upload CSV to your server and modify loadCourseData()');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error loading course data:', error);
+                console.log('Falling back to demo data...');
+                return false;
+            }
+        }
+
+        function proceedToProfile() {
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+            currentUser.username = username;
+            document.getElementById('loginStep').style.display = 'none';
+            document.getElementById('profileStep').style.display = 'block';
+        }
+
+        function initializeMajorDropdown() {
+            const dropdown = document.getElementById('majorDropdown');
+            ALL_MAJORS.forEach(major => {
+                const option = document.createElement('div');
+                option.className = 'major-option';
+                option.textContent = major;
+                option.onclick = () => selectMajor(major);
+                dropdown.appendChild(option);
+            });
+        }
+
+        function filterMajors() {
+            const input = document.getElementById('majorSearch');
+            const dropdown = document.getElementById('majorDropdown');
+            const filter = input.value.toLowerCase();
+            
+            const options = dropdown.querySelectorAll('.major-option');
+            options.forEach(option => {
+                if (option.textContent.toLowerCase().includes(filter)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        function showMajorDropdown() {
+            document.getElementById('majorDropdown').style.display = 'block';
+        }
+
+        function selectMajor(major) {
+            document.getElementById('majorSearch').value = major;
+            document.getElementById('majorDropdown').style.display = 'none';
+            currentUser.major = major;
+        }
+
+        function initializeAPSections() {
+            const exams = Object.keys(AP_EXAMS);
+            ['ap5s', 'ap4s', 'ap3s'].forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                exams.forEach(exam => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="checkbox" value="${exam}"> ${exam}`;
+                    section.appendChild(label);
+                });
+            });
+        }
+
+        function toggleAPSections() {
+            const hasAPs = document.getElementById('hasAPs').checked;
+            document.getElementById('apSections').style.display = hasAPs ? 'block' : 'none';
+        }
+
+        function proceedToPriorities() {
+            const major = document.getElementById('majorSearch').value;
+            const gradYear = document.getElementById('gradYear').value;
+            
+            if (!major || !gradYear) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            currentUser.major = major;
+            currentUser.gradYear = gradYear;
+            
+            // Collect AP credits
+            if (document.getElementById('hasAPs').checked) {
+                currentUser.apCredits = {
+                    5: Array.from(document.querySelectorAll('#ap5s input:checked')).map(cb => cb.value),
+                    4: Array.from(document.querySelectorAll('#ap4s input:checked')).map(cb => cb.value),
+                    3: Array.from(document.querySelectorAll('#ap3s input:checked')).map(cb => cb.value)
+                };
+            }
+            
+            document.getElementById('profileStep').style.display = 'none';
+            document.getElementById('priorityStep').style.display = 'block';
+        }
+
+        function initializePriorityDragDrop() {
+            const priorityList = document.getElementById('priorityList');
+            let draggedElement = null;
+
+            priorityList.addEventListener('dragstart', function(e) {
+                draggedElement = e.target;
+                e.target.classList.add('dragging');
+            });
+
+            priorityList.addEventListener('dragend', function(e) {
+                e.target.classList.remove('dragging');
+            });
+
+            priorityList.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+
+            priorityList.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (e.target.classList.contains('priority-item') && e.target !== draggedElement) {
+                    const allItems = Array.from(priorityList.children);
+                    const draggedIndex = allItems.indexOf(draggedElement);
+                    const targetIndex = allItems.indexOf(e.target);
+                    
+                    if (draggedIndex < targetIndex) {
+                        e.target.parentNode.insertBefore(draggedElement, e.target.nextSibling);
+                    } else {
+                        e.target.parentNode.insertBefore(draggedElement, e.target);
+                    }
+                }
+            });
+
+            // Make items draggable
+            const items = priorityList.querySelectorAll('.priority-item');
+            items.forEach(item => {
+                item.draggable = true;
+            });
+        }
+
+        function startCourseRecommendation() {
+            // Collect priority ranking
+            const priorityItems = document.querySelectorAll('.priority-item');
+            currentUser.priorities = Array.from(priorityItems).map(item => item.dataset.priority);
+            
+            // Hide setup and show main app
+            document.getElementById('setupPhase').style.display = 'none';
+            document.getElementById('mainNav').style.display = 'flex';
+            document.getElementById('courses').classList.add('active');
+            document.getElementById('creditCounter').style.display = 'block';
+            
+            // Generate course recommendations
+            generateCourseRecommendations();
+        }
+
+        async function generateCourseRecommendations() {
+            console.log('Generating recommendations from real course data...');
+            
+            // Ensure course data is loaded
+            if (fa25Courses.length === 0) {
+                const loaded = await loadCourseData();
+                if (!loaded) {
+                    // Use fallback sample data if CSV loading failed
+                    courseRecommendations = getSampleCourses();
+                    currentCardIndex = 0;
+                    displayCurrentCard();
+                    showSwipeHint();
+                    return;
+                }
+            }
+
+            // Filter and score courses based on user profile
+            const recommendations = [];
+            
+            // Define course prefixes for Luddy and Kelley
+            const luddyPrefixes = ['CSCI', 'INFO', 'ENGR', 'STAT', 'LIS', 'SICE', 'ISE', 'DSCI'];
+            const kelleyPrefixes = ['BUS', 'ACCT', 'FIN', 'MARK', 'MGMT', 'OPER', 'ECON', 'BEPP'];
+            
+            // Determine user's school based on major
+            const isLuddyMajor = LUDDY_MAJORS.includes(currentUser.major);
+            const isKelleyMajor = KELLEY_MAJORS.includes(currentUser.major);
+            
+            // Filter courses based on major and other criteria
+            const relevantCourses = fa25Courses.filter(course => {
+                if (!course.course_code || !course.title || !course.instructor) return false;
+                
+                // Skip courses with no GPA data
+                if (course.avg_gpa_section === 'NR' || course.avg_gpa_student === 'NR') return false;
+                if (typeof course.avg_gpa_section !== 'number' || typeof course.avg_gpa_student !== 'number') return false;
+                
+                // Filter by school preference
+                const coursePrefix = course.course_code.split(/[\s-]/)[0];
+                
+                if (isLuddyMajor && luddyPrefixes.includes(coursePrefix)) return true;
+                if (isKelleyMajor && kelleyPrefixes.includes(coursePrefix)) return true;
+                
+                // Include some general education courses
+                const genEdPrefixes = ['MATH', 'ENG', 'HIST', 'PSYC', 'BIOL', 'CHEM', 'PHYS'];
+                if (genEdPrefixes.includes(coursePrefix)) return true;
+                
+                return false;
+            });
+
+            console.log(`Found ${relevantCourses.length} relevant courses for ${currentUser.major}`);
+
+            // Score and sort courses
+            const scoredCourses = relevantCourses.map(course => {
+                let score = 0;
+                
+                // Extract course level
+                const levelMatch = course.course_code.match(/(\d{3,4})/);
+                const courseLevel = levelMatch ? parseInt(levelMatch[1]) : 0;
+                
+                // Priority scoring based on user preferences
+                const priorityWeights = {
+                    major_fulfillment: currentUser.priorities?.indexOf('major_fulfillment') === 0 ? 3 : 
+                                      currentUser.priorities?.indexOf('major_fulfillment') === 1 ? 2 : 1,
+                    grade_distribution: currentUser.priorities?.indexOf('grade_distribution') === 0 ? 3 : 
+                                       currentUser.priorities?.indexOf('grade_distribution') === 1 ? 2 : 1,
+                    teacher_rating: currentUser.priorities?.indexOf('teacher_rating') === 0 ? 3 : 
+                                   currentUser.priorities?.indexOf('teacher_rating') === 1 ? 2 : 1
+                };
+
+                // Major fulfillment score (higher for matching school)
+                const coursePrefix = course.course_code.split(/[\s-]/)[0];
+                if ((isLuddyMajor && luddyPrefixes.includes(coursePrefix)) || 
+                    (isKelleyMajor && kelleyPrefixes.includes(coursePrefix))) {
+                    score += 50 * priorityWeights.major_fulfillment;
+                }
+
+                // Appropriate course level (100-200 level preferred for undergrad)
+                if (courseLevel >= 100 && courseLevel < 300) {
+                    score += 30;
+                } else if (courseLevel >= 300 && courseLevel < 500) {
+                    score += 20;
+                }
+
+                // Grade distribution score
+                const aPercent = parseFloat(course.grades_a_percent) || 0;
+                score += (aPercent / 10) * priorityWeights.grade_distribution;
+
+                // GPA boost potential
+                const gpaDiff = course.avg_gpa_section - course.avg_gpa_student;
+                if (gpaDiff > 0) {
+                    score += gpaDiff * 10 * priorityWeights.grade_distribution;
+                }
+
+                // Penalize courses with very low enrollment
+                if (course.grades_total && course.grades_total < 5) {
+                    score -= 20;
+                }
+
+                return {
+                    ...course,
+                    score: score,
+                    level: courseLevel,
+                    credits: estimateCredits(course.course_code),
+                    gpa_differential: gpaDiff
+                };
+            });
+
+            // Sort by score and take top recommendations
+            scoredCourses.sort((a, b) => b.score - a.score);
+            const topCourses = scoredCourses.slice(0, 20);
+
+            // Convert to recommendation format
+            courseRecommendations = topCourses.map(course => ({
+                code: course.course_code,
+                title: course.title,
+                instructor: course.instructor || 'TBA',
+                credits: course.credits,
+                gpa_section: course.avg_gpa_section,
+                gpa_student: course.avg_gpa_student,
+                grades_a_percent: parseFloat(course.grades_a_percent) || 0,
+                building: extractBuilding(course.course_code),
+                room: 'TBA',
+                time_slots: ['TBA - Check IU registration system'],
+                open_seats: Math.floor(Math.random() * 20) + 5, // Simulated
+                total_seats: Math.floor(Math.random() * 30) + 25, // Simulated
+                level: course.level,
+                prereqs: getPrerequisites(course.course_code, course.level)
+            }));
+
+            console.log(`Generated ${courseRecommendations.length} recommendations`);
+            
+            currentCardIndex = 0;
+            displayCurrentCard();
+            showSwipeHint();
+        }
+
+        function getSampleCourses() {
+            // Fallback sample data when CSV loading fails
+            return [
+                {
+                    code: 'CSCI-A 201',
+                    title: 'Introduction to Programming I',
+                    instructor: 'Dr. Smith, John',
+                    credits: 4,
+                    gpa_section: 3.2,
+                    gpa_student: 2.8,
+                    grades_a_percent: 45,
+                    building: 'Luddy Hall',
+                    room: '1106',
+                    time_slots: ['MWF 10:10-11:00'],
+                    open_seats: 15,
+                    total_seats: 25,
+                    level: 200,
+                    prereqs: ['MATH-M 119 or equivalent']
+                },
+                {
+                    code: 'MATH-M 211',
+                    title: 'Calculus I',
+                    instructor: 'Prof. Johnson, Sarah',
+                    credits: 4,
+                    gpa_section: 2.9,
+                    gpa_student: 2.7,
+                    grades_a_percent: 35,
+                    building: 'Swain Hall',
+                    room: 'SW 222',
+                    time_slots: ['MWF 9:05-9:55'],
+                    open_seats: 8,
+                    total_seats: 30,
+                    level: 200,
+                    prereqs: ['MATH-M 119 or AP Calculus']
+                },
+                {
+                    code: 'INFO-I 101',
+                    title: 'Introduction to Informatics',
+                    instructor: 'Dr. Brown, Michael',
+                    credits: 3,
+                    gpa_section: 3.4,
+                    gpa_student: 3.0,
+                    grades_a_percent: 60,
+                    building: 'Luddy Hall',
+                    room: '0112',
+                    time_slots: ['TR 2:30-3:45'],
+                    open_seats: 22,
+                    total_seats: 40,
+                    level: 100,
+                    prereqs: ['None']
+                }
+            ];
+        }
+
+        function estimateCredits(courseCode) {
+            // Estimate credit hours based on course patterns
+            if (courseCode.includes('LAB') || courseCode.includes('L ')) return 1;
+            if (courseCode.match(/[A-Z]-[A-Z]\s*[1-4]\d{2}/)) return 3; // Most courses
+            if (courseCode.includes('MATH') || courseCode.includes('CSCI')) return 4;
+            return 3; // Default
+        }
+
+        function extractBuilding(courseCode) {
+            const prefix = courseCode.split(/[\s-]/)[0];
+            const buildingMap = {
+                'CSCI': 'Luddy Hall',
+                'INFO': 'Luddy Hall',
+                'ENGR': 'Luddy Hall',
+                'STAT': 'Luddy Hall',
+                'BUS': 'Kelley School',
+                'ACCT': 'Kelley School',
+                'FIN': 'Kelley School',
+                'MARK': 'Kelley School',
+                'MGMT': 'Kelley School',
+                'ECON': 'Wylie Hall',
+                'MATH': 'Rawles Hall',
+                'ENG': 'Ballantine Hall',
+                'HIST': 'Ballantine Hall',
+                'PSYC': 'Psychology Building',
+                'BIOL': 'Jordan Hall',
+                'CHEM': 'Chemistry Building',
+                'PHYS': 'Swain Hall'
+            };
+            return buildingMap[prefix] || 'Campus Building';
+        }
+
+        function getPrerequisites(courseCode, level) {
+            // Estimate prerequisites based on course level and type
+            if (level < 200) return ['None'];
+            if (courseCode.includes('CSCI') && level >= 200) return ['CSCI-A 201 or equivalent programming experience'];
+            if (courseCode.includes('MATH') && level >= 200) return ['MATH-M 119 or equivalent'];
+            if (courseCode.includes('STAT')) return ['MATH-M 119 and sophomore standing'];
+            if (level >= 300) return ['Prerequisites vary - check course catalog'];
+            return ['Check course catalog for specific requirements'];
+        }
+
+        function displayCurrentCard() {
+            const cardStack = document.getElementById('cardStack');
+            cardStack.innerHTML = '';
+            
+            if (currentCardIndex >= courseRecommendations.length) {
+                cardStack.innerHTML = `
+                    <div class="no-more-cards">
+                        <h3>All done!</h3>
+                        <p>You've reviewed all recommended courses. Check your schedule to see your selected classes!</p>
+                        <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                            <strong>Tip:</strong> Visit your academic advisor to finalize your course registration!
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const course = courseRecommendations[currentCardIndex];
+            const gpaDiff = (course.gpa_section - course.gpa_student).toFixed(2);
+            const gpaColor = parseFloat(gpaDiff) > 0 ? '#10b981' : parseFloat(gpaDiff) < 0 ? '#ef4444' : '#6b7280';
+            
+            const card = document.createElement('div');
+            card.className = 'course-card';
+            card.innerHTML = `
+                <h3>${course.code}</h3>
+                <h4 style="color: #4b5563; margin-bottom: 20px;">${course.title}</h4>
+                
+                <div class="course-details">
+                    <p><strong>Instructor:</strong> ${course.instructor}</p>
+                    <p><strong>Credits:</strong> ${course.credits}</p>
+                    <p><strong>Location:</strong> ${course.building} ${course.room}</p>
+                    <p><strong>Prerequisites:</strong> ${course.prereqs.join(', ')}</p>
+                    <p><strong>Course Level:</strong> ${course.level}-level</p>
+                </div>
+                
+                <div class="gpa-differential" style="background: linear-gradient(135deg, ${gpaColor} 0%, ${gpaColor}dd 100%);">
+                    GPA Impact: ${parseFloat(gpaDiff) >= 0 ? '+' : ''}${gpaDiff}
+                </div>
+                
+                <div class="gpa-explanation">
+                    This shows the difference between course GPA (${course.gpa_section}) and average student GPA (${course.gpa_student}). 
+                    Positive numbers suggest this course typically awards higher grades than students' overall GPAs.
+                </div>
+                
+                <div class="time-slots">
+                    <strong>Schedule:</strong><br>
+                    ${course.time_slots.map(slot => slot).join('<br>')}
+                    <br><br>
+                    <strong>Availability:</strong> 
+                    <span style="color: ${course.open_seats < 10 ? '#dc3545' : '#28a745'}">
+                        ${course.open_seats}/${course.total_seats} seats open
+                        ${course.open_seats < 10 ? ' (Limited!)' : ''}
+                    </span>
+                    <br>
+                    <strong>Grade Distribution:</strong> ${course.grades_a_percent}% A grades
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="reject-btn" onclick="rejectCourse()">Pass</button>
+                    <button class="accept-btn" onclick="acceptCourse()">Add to Schedule</button>
+                </div>
+            `;
+            
+            cardStack.appendChild(card);
+            addEnhancedSwipeGestures(card);
+        }
+
+        function showSwipeHint() {
+            const hint = document.getElementById('swipeHint');
+            hint.classList.add('show');
+            setTimeout(() => {
+                hint.classList.remove('show');
+            }, 3000);
+        }
+
+        function addEnhancedSwipeGestures(card) {
+            let startX = 0, startY = 0;
+            let currentX = 0, currentY = 0;
+            let cardBeingDragged = false;
+
+            // Touch events
+            card.addEventListener('touchstart', handleTouchStart, { passive: false });
+            card.addEventListener('touchmove', handleTouchMove, { passive: false });
+            card.addEventListener('touchend', handleTouchEnd);
+
+            // Mouse events for desktop
+            card.addEventListener('mousedown', handleMouseStart);
+            
+            function handleTouchStart(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                cardBeingDragged = true;
+                card.style.transition = 'none';
+            }
+            
+            function handleMouseStart(e) {
+                startX = e.clientX;
+                startY = e.clientY;
+                cardBeingDragged = true;
+                card.style.transition = 'none';
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseEnd);
+            }
+
+            function handleTouchMove(e) {
+                if (!cardBeingDragged) return;
+                e.preventDefault();
+                
+                currentX = e.touches[0].clientX - startX;
+                currentY = e.touches[0].clientY - startY;
+                
+                updateCardPosition();
+            }
+            
+            function handleMouseMove(e) {
+                if (!cardBeingDragged) return;
+                
+                currentX = e.clientX - startX;
+                currentY = e.clientY - startY;
+                
+                updateCardPosition();
+            }
+
+            function updateCardPosition() {
+                const rotation = currentX * 0.1;
+                const scale = Math.max(0.95, 1 - Math.abs(currentX) * 0.0005);
+                
+                card.style.transform = `translateX(${currentX}px) translateY(${currentY * 0.1}px) rotate(${rotation}deg) scale(${scale})`;
+                
+                // Visual feedback
+                const opacity = Math.max(0.1, 1 - Math.abs(currentX) * 0.002);
+                if (currentX > 50) {
+                    card.style.boxShadow = `0 0 20px rgba(16, 185, 129, ${opacity})`;
+                } else if (currentX < -50) {
+                    card.style.boxShadow = `0 0 20px rgba(239, 68, 68, ${opacity})`;
+                } else {
+                    card.style.boxShadow = '0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)';
+                }
+            }
+
+            function handleTouchEnd(e) {
+                handleEnd();
+            }
+            
+            function handleMouseEnd(e) {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseEnd);
+                handleEnd();
+            }
+
+            function handleEnd() {
+                if (!cardBeingDragged) return;
+                
+                cardBeingDragged = false;
+                card.style.transition = 'all 0.3s ease';
+                
+                const threshold = 100;
+                
+                if (Math.abs(currentX) > threshold) {
+                    if (currentX > 0) {
+                        acceptCourse();
+                    } else {
+                        rejectCourse();
+                    }
+                } else {
+                    // Snap back
+                    card.style.transform = 'translateX(0) translateY(0) rotate(0deg) scale(1)';
+                    card.style.boxShadow = '0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)';
+                }
+                
+                currentX = 0;
+                currentY = 0;
+            }
+        }
+
+        function rejectCourse() {
+            animateCardOut('left');
+            setTimeout(() => {
+                currentCardIndex++;
+                displayCurrentCard();
+            }, 300);
+        }
+
+        function acceptCourse() {
+            const course = courseRecommendations[currentCardIndex];
+            
+            // Check credit limit
+            if (totalCredits + course.credits > 18) {
+                alert('Adding this course would exceed the 18 credit limit!');
+                return;
+            }
+            
+            selectedCourses.push(course);
+            totalCredits += course.credits;
+            updateCreditCounter();
+            updateSchedule();
+            
+            animateCardOut('right');
+            setTimeout(() => {
+                currentCardIndex++;
+                if (totalCredits >= 18) {
+                    // Stop showing more cards
+                    document.getElementById('cardStack').innerHTML = `
+                        <div class="no-more-cards">
+                            <h3>Credit limit reached!</h3>
+                            <p>You've reached the 18 credit limit. Check your schedule to review your courses!</p>
+                        </div>
+                    `;
+                } else {
+                    displayCurrentCard();
+                }
+            }, 300);
+        }
+
+        function animateCardOut(direction) {
+            const card = document.querySelector('.course-card');
+            if (card) {
+                const translateX = direction === 'left' ? '-100vw' : '100vw';
+                const rotation = direction === 'left' ? '-30deg' : '30deg';
+                card.style.transform = `translateX(${translateX}) rotate(${rotation})`;
+                card.style.opacity = '0';
+            }
+        }
+
+        function updateCreditCounter() {
+            document.getElementById('creditCount').textContent = totalCredits;
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Initialize specific tab content if needed
+            if (tabName === 'progress') {
+                initializeDegreeProgress();
+            } else if (tabName === 'gpa' && gpaCoursesCount === 0) {
+                addGPACourse(); // Add first course automatically
+            }
+        }
+
+        function generateScheduleCalendar() {
+            const calendar = document.getElementById('scheduleCalendar');
+            const times = ['8:00', '9:00', '10:00', '11:00', '12:00', '1:00', '2:00', '3:00', '4:00', '5:00'];
+            
+            times.forEach(time => {
+                // Add time slot
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = time;
+                calendar.appendChild(timeSlot);
+                
+                // Add cells for each day
+                for (let day = 0; day < 5; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'calendar-cell';
+                    cell.dataset.time = time;
+                    cell.dataset.day = day;
+                    calendar.appendChild(cell);
+                }
+            });
+        }
+
+        function updateSchedule() {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+            
+            selectedCourses.forEach(course => {
+                const courseDiv = document.createElement('div');
+                courseDiv.innerHTML = `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 8px;">
+                        <strong>${course.code}: ${course.title}</strong><br>
+                        <small>${course.building} ${course.room} | ${course.instructor} | ${course.credits} credits</small><br>
+                        <small>${course.time_slots.join(', ')}</small>
+                    </div>
+                `;
+                courseList.appendChild(courseDiv);
+            });
+            
+            // Update calendar with course blocks
+            updateCalendarBlocks();
+        }
+
+        function updateCalendarBlocks() {
+            // Clear existing course blocks
+            document.querySelectorAll('.course-block').forEach(block => block.remove());
+            
+            selectedCourses.forEach(course => {
+                course.time_slots.forEach(timeSlot => {
+                    // Parse time slot (e.g., "MWF 10:10-11:00")
+                    const match = timeSlot.match(/([MTWRF]+)\s+(\d{1,2}):(\d{2})/);
+                    if (match) {
+                        const days = match[1];
+                        const hour = parseInt(match[2]);
+                        
+                        // Map days to indices
+                        const dayMap = { M: 0, T: 1, W: 2, R: 3, F: 4 };
+                        
+                        [...days].forEach(dayLetter => {
+                            const dayIndex = dayMap[dayLetter];
+                            if (dayIndex !== undefined) {
+                                const cell = document.querySelector(`[data-time="${hour}:00"][data-day="${dayIndex}"]`);
+                                if (cell) {
+                                    const courseBlock = document.createElement('div');
+                                    courseBlock.className = 'course-block';
+                                    courseBlock.textContent = course.code;
+                                    courseBlock.title = `${course.title}\n${course.building} ${course.room}`;
+                                    cell.appendChild(courseBlock);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // GPA Calculator functions
+        let gpaCoursesCount = 0;
+
+        function addGPACourse() {
+            gpaCoursesCount++;
+            const gpaInputs = document.getElementById('gpaInputs');
+            
+            const courseDiv = document.createElement('div');
+            courseDiv.className = 'gpa-input';
+            courseDiv.innerHTML = `
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" placeholder="Course Name" style="flex: 1;">
+                    <select style="width: 80px;" onchange="calculateGPA()">
+                        <option value="">Grade</option>
+                        <option value="4.0">A+</option>
+                        <option value="4.0">A</option>
+                        <option value="3.7">A-</option>
+                        <option value="3.3">B+</option>
+                        <option value="3.0">B</option>
+                        <option value="2.7">B-</option>
+                        <option value="2.3">C+</option>
+                        <option value="2.0">C</option>
+                        <option value="1.7">C-</option>
+                        <option value="1.3">D+</option>
+                        <option value="1.0">D</option>
+                        <option value="0.0">F</option>
+                    </select>
+                    <input type="number" placeholder="Credits" min="1" max="6" style="width: 80px;" onchange="calculateGPA()">
+                    <button onclick="this.parentElement.parentElement.remove(); calculateGPA();" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;">×</button>
+                </div>
+            `;
+            gpaInputs.appendChild(courseDiv);
+        }
+
+        function calculateGPA() {
+            const gpaInputs = document.querySelectorAll('.gpa-input');
+            let totalPoints = 0;
+            let totalCredits = 0;
+            
+            gpaInputs.forEach(input => {
+                const grade = parseFloat(input.querySelector('select').value);
+                const credits = parseFloat(input.querySelector('input[type="number"]').value);
+                
+                if (!isNaN(grade) && !isNaN(credits)) {
+                    totalPoints += grade * credits;
+                    totalCredits += credits;
+                }
+            });
+            
+            const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+            document.getElementById('calculatedGPA').textContent = gpa;
+        }
+
+        // Degree Progress functions
+        function initializeDegreeProgress() {
+            const degreeProgress = document.getElementById('degreeProgress');
+            
+            // Sample degree requirements based on major
+            const requirements = {
+                'Computer Science (B.S.)': {
+                    'Core Computer Science': [
+                        { course: 'CSCI-A 201', title: 'Introduction to Programming I', completed: false, credits: 4 },
+                        { course: 'CSCI-A 202', title: 'Introduction to Programming II', completed: false, credits: 4 },
+                        { course: 'CSCI-C 241', title: 'Discrete Structures', completed: false, credits: 3 },
+                        { course: 'CSCI-B 351', title: 'Introduction to Systems Programming', completed: false, credits: 3 }
+                    ],
+                    'Mathematics': [
+                        { course: 'MATH-M 211', title: 'Calculus I', completed: false, credits: 4 },
+                        { course: 'MATH-M 212', title: 'Calculus II', completed: false, credits: 4 },
+                        { course: 'STAT-S 301', title: 'Applied Statistical Methods', completed: false, credits: 3 }
+                    ],
+                    'General Education': [
+                        { course: 'ENG-W 131', title: 'Elementary Composition', completed: false, credits: 3 },
+                        { course: 'Cultural Studies', title: 'Cultural Studies Requirement', completed: false, credits: 3 },
+                        { course: 'Natural Sciences', title: 'Natural Sciences Requirement', completed: false, credits: 6 }
+                    ]
+                },
+                'Business Analytics (B.S.)': {
+                    'Core Business': [
+                        { course: 'BUS-A 100', title: 'Basic Accounting', completed: false, credits: 3 },
+                        { course: 'BUS-F 301', title: 'Financial Management', completed: false, credits: 3 },
+                        { course: 'BUS-M 301', title: 'Introduction to Management', completed: false, credits: 3 }
+                    ],
+                    'Analytics Core': [
+                        { course: 'BUS-K 201', title: 'The Computer in Business', completed: false, credits: 3 },
+                        { course: 'STAT-S 301', title: 'Applied Statistical Methods', completed: false, credits: 3 },
+                        { course: 'BUS-K 353', title: 'Database Management Systems', completed: false, credits: 3 }
+                    ],
+                    'Mathematics': [
+                        { course: 'MATH-M 211', title: 'Calculus I', completed: false, credits: 4 },
+                        { course: 'ECON-E 201', title: 'Introduction to Microeconomics', completed: false, credits: 3 },
+                        { course: 'ECON-E 202', title: 'Introduction to Macroeconomics', completed: false, credits: 3 }
+                    ]
+                }
+            };
+            
+            const userMajor = currentUser.major || 'Computer Science (B.S.)';
+            const majorRequirements = requirements[userMajor] || requirements['Computer Science (B.S.)'];
+            
+            // Mark courses as completed based on AP credits and selected courses
+            markCompletedCourses(majorRequirements);
+            
+            // Generate progress display
+            degreeProgress.innerHTML = '';
+            Object.entries(majorRequirements).forEach(([category, courses]) => {
+                const section = document.createElement('div');
+                section.className = 'requirement-section';
+                
+                const completedCount = courses.filter(c => c.completed).length;
+                const totalCount = courses.length;
+                const completedCredits = courses.filter(c => c.completed).reduce((sum, c) => sum + c.credits, 0);
+                const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0);
+                
+                section.innerHTML = `
+                    <div class="requirement-header">
+                        ${category} (${completedCount}/${totalCount} courses, ${completedCredits}/${totalCredits} credits)
+                    </div>
+                    <div class="requirement-content">
+                        ${courses.map(course => `
+                            <div class="requirement-item">
+                                <span class="${course.completed ? 'completed' : 'incomplete'}">
+                                    ${course.completed ? '✅' : '❌'} ${course.course}: ${course.title}
+                                </span>
+                                <span>${course.credits} cr</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                degreeProgress.appendChild(section);
+            });
+        }
+
+        function markCompletedCourses(requirements) {
+            // Mark courses completed through AP credits
+            if (currentUser.apCredits) {
+                Object.entries(currentUser.apCredits).forEach(([score, exams]) => {
+                    exams.forEach(exam => {
+                        const credit = AP_EXAMS[exam]?.[score];
+                        if (credit && credit !== 'UNDI') {
+                            // Mark corresponding courses as completed
+                            Object.values(requirements).flat().forEach(course => {
+                                if (credit.includes(course.course)) {
+                                    course.completed = true;
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // Mark courses completed through current enrollment
+            selectedCourses.forEach(selectedCourse => {
+                Object.values(requirements).flat().forEach(course => {
+                    if (course.course === selectedCourse.code) {
+                        course.completed = true;
+                    }
+                });
+            });
+        }
+
+        // Auto-save user progress to memory
+        let userSession = {
+            profile: {},
+            selectedCourses: [],
+            preferences: {}
+        };
+
+        function saveUserSession() {
+            userSession.profile = currentUser;
+            userSession.selectedCourses = selectedCourses;
+            userSession.preferences = {
+                totalCredits: totalCredits,
+                currentCardIndex: currentCardIndex
+            };
+            // In a real app, this would save to a backend database
+            console.log('User session saved:', userSession);
+        }
+
+        function loadUserSession() {
+            // In a real app, this would load from backend
+            // For demo purposes, we'll start fresh each time
+            console.log('User session loaded (demo mode)');
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('courses').classList.contains('active')) {
+                if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                    rejectCourse();
+                } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                    acceptCourse();
+                }
+            }
+        });
+
+        // Click outside to close dropdown
+        document.addEventListener('click', function(event) {
+            const majorSearch = document.getElementById('majorSearch');
+            const majorDropdown = document.getElementById('majorDropdown');
+            
+            if (!majorSearch.contains(event.target) && !majorDropdown.contains(event.target)) {
+                majorDropdown.style.display = 'none';
+            }
+        });
+
+        // Course recommendation algorithm (enhanced)
+        function generateAdvancedRecommendations() {
+            // This would be the core AI recommendation engine
+            // Factors to consider:
+            // 1. Major fulfillment (highest weight by default)
+            // 2. Prerequisites met
+            // 3. Course level appropriate to student year
+            // 4. GPA boost potential
+            // 5. Grade distribution (A percentage)
+            // 6. Available seats
+            // 7. Time conflicts with already selected courses
+            
+            const priorityWeights = {
+                major_fulfillment: currentUser.priorities.indexOf('major_fulfillment') === 0 ? 3 : 
+                                  currentUser.priorities.indexOf('major_fulfillment') === 1 ? 2 : 1,
+                grade_distribution: currentUser.priorities.indexOf('grade_distribution') === 0 ? 3 : 
+                                   currentUser.priorities.indexOf('grade_distribution') === 1 ? 2 : 1,
+                teacher_rating: currentUser.priorities.indexOf('teacher_rating') === 0 ? 3 : 
+                               currentUser.priorities.indexOf('teacher_rating') === 1 ? 2 : 1
+            };
+            
+            console.log('Advanced recommendation algorithm would run here with weights:', priorityWeights);
+        }
+    </script>
+</body>
+</html>
