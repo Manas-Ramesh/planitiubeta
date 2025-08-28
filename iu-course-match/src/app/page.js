@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from 'react';
 
 const IUCourseMatch = () => {
@@ -408,8 +407,48 @@ const IUCourseMatch = () => {
 
   const ALL_MAJORS = [...LUDDY_MAJORS, ...KELLEY_MAJORS].sort();
 
-  // Sample course data
+  // Comprehensive AP Exam data
+  const AP_EXAMS_FULL = {
+    'Art History': { 5: 'ARTH-A 100 (3 cr)', 4: 'ARTH-A 100 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Biology': { 5: 'BIOL-L 111+L 113 (8 cr)', 4: 'BIOL-L 111 (4 cr)', 3: 'UNDI (3 cr)' },
+    'Calculus AB': { 5: 'MATH-M 211 (4 cr)', 4: 'MATH-M 211 (4 cr)', 3: 'MATH UN100 (3 cr)' },
+    'Calculus BC': { 5: 'MATH-M 211+M 212 (8 cr)', 4: 'MATH-M 211 (4 cr)', 3: 'MATH-M 211 (4 cr)' },
+    'Chemistry': { 5: 'CHEM-C 117+C 127 (8 cr)', 4: 'CHEM-C 105+C 125 (6 cr)', 3: 'UNDI (3 cr)' },
+    'Chinese Language': { 5: 'CHIN-C 250 (4 cr)', 4: 'CHIN-C 200 (3 cr)', 3: 'CHIN-C 100 (3 cr)' },
+    'Computer Science A': { 5: 'CSCI-A 201 (4 cr)', 4: 'CSCI-A 110 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Computer Science Principles': { 5: 'CSCI-A 110 (3 cr)', 4: 'CSCI-A 110 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Economics Macro': { 5: 'ECON-E 201 (3 cr)', 4: 'ECON-E 201 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Economics Micro': { 5: 'ECON-E 202 (3 cr)', 4: 'ECON-E 202 (3 cr)', 3: 'UNDI (3 cr)' },
+    'English Language': { 5: 'ENG-W 131EX+L 198 (6 cr)', 4: 'ENG-W 131EX+L 198 (6 cr)', 3: 'ENG-L 198 (3 cr)' },
+    'English Literature': { 5: 'ENG-W 131EX+L 198 (6 cr)', 4: 'ENG-W 131EX+L 198 (6 cr)', 3: 'ENG-L 198 (3 cr)' },
+    'Environmental Science': { 5: 'GEOL-G 107+L 107 (5 cr)', 4: 'GEOL-G 107 (3 cr)', 3: 'UNDI (3 cr)' },
+    'European History': { 5: 'HIST-H 113+H 114 (6 cr)', 4: 'HIST-H 113 (3 cr)', 3: 'UNDI (3 cr)' },
+    'French Language': { 5: 'FREN-F 250 (4 cr)', 4: 'FREN-F 200 (3 cr)', 3: 'FREN-F 100 (3 cr)' },
+    'German Language': { 5: 'GER-G 250 (4 cr)', 4: 'GER-G 200 (3 cr)', 3: 'GER-G 100 (3 cr)' },
+    'Government & Politics': { 5: 'POLS-Y 103 (3 cr)', 4: 'POLS-Y 103 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Human Geography': { 5: 'GEOG-G 110 (3 cr)', 4: 'GEOG-G 110 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Italian Language': { 5: 'ITAL-M 250 (4 cr)', 4: 'ITAL-M 200 (3 cr)', 3: 'ITAL-M 100 (3 cr)' },
+    'Japanese Language': { 5: 'EALC-J 250 (4 cr)', 4: 'EALC-J 200 (3 cr)', 3: 'EALC-J 100 (3 cr)' },
+    'Latin': { 5: 'CLAS-L 250 (4 cr)', 4: 'CLAS-L 200 (3 cr)', 3: 'CLAS-L 100 (3 cr)' },
+    'Music Theory': { 5: 'MUS-T 109+T 111 (6 cr)', 4: 'MUS-T 109 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Physics 1': { 5: 'PHYS-P 201 (5 cr)', 4: 'PHYS-P 201 (5 cr)', 3: 'UNDI (3 cr)' },
+    'Physics 2': { 5: 'PHYS-P 202 (5 cr)', 4: 'PHYS-P 202 (5 cr)', 3: 'UNDI (3 cr)' },
+    'Physics C Mechanics': { 5: 'PHYS-P 221 (5 cr)', 4: 'PHYS-P 221 (5 cr)', 3: 'UNDI (3 cr)' },
+    'Physics C E&M': { 5: 'PHYS-P 222 (5 cr)', 4: 'PHYS-P 222 (5 cr)', 3: 'UNDI (3 cr)' },
+    'Precalculus': { 5: 'MATH-M 119 (3 cr)', 4: 'MATH-M 119 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Psychology': { 5: 'PSY-P 101 (3 cr)', 4: 'PSY-P 101 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Spanish Language': { 5: 'HISP-S 250 (4 cr)', 4: 'HISP-S 200 (3 cr)', 3: 'HISP-S 100 (3 cr)' },
+    'Statistics': { 5: 'STAT-S 301 (3 cr)', 4: 'STAT-S 301 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Studio Art 2D': { 5: 'FINA-F 100 (3 cr)', 4: 'FINA-F 100 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Studio Art 3D': { 5: 'FINA-S 100 (3 cr)', 4: 'FINA-S 100 (3 cr)', 3: 'UNDI (3 cr)' },
+    'Studio Art Drawing': { 5: 'FINA-F 101 (3 cr)', 4: 'FINA-F 101 (3 cr)', 3: 'UNDI (3 cr)' },
+    'US History': { 5: 'HIST-H 105+H 106 (6 cr)', 4: 'HIST-H 105 (3 cr)', 3: 'UNDI (3 cr)' },
+    'World History': { 5: 'HIST-H 109+H 110 (6 cr)', 4: 'HIST-H 109 (3 cr)', 3: 'UNDI (3 cr)' }
+  };
+
+  // Sample course data - comprehensive list
   const sampleCourses = [
+    // Computer Science Courses
     {
       code: 'CSCI-A 201',
       title: 'Introduction to Programming I',
@@ -427,6 +466,55 @@ const IUCourseMatch = () => {
       prereqs: ['MATH-M 119 or equivalent']
     },
     {
+      code: 'CSCI-C 200',
+      title: 'Introduction to Computers and Programming',
+      instructor: 'Prof. Chen, Lisa',
+      credits: 3,
+      gpa_section: 3.0,
+      gpa_student: 2.9,
+      grades_a_percent: 40,
+      building: 'Luddy Hall',
+      room: '2125',
+      time_slots: ['TR 9:30-10:45'],
+      open_seats: 18,
+      total_seats: 35,
+      level: 200,
+      prereqs: ['None']
+    },
+    {
+      code: 'CSCI-C 211',
+      title: 'Introduction to Computer Science',
+      instructor: 'Dr. Rodriguez, Miguel',
+      credits: 4,
+      gpa_section: 2.8,
+      gpa_student: 2.7,
+      grades_a_percent: 32,
+      building: 'Luddy Hall',
+      room: '1106',
+      time_slots: ['MWF 11:15-12:05', 'Lab: F 2:30-4:30'],
+      open_seats: 8,
+      total_seats: 30,
+      level: 200,
+      prereqs: ['CSCI-A 201 or equivalent']
+    },
+    {
+      code: 'CSCI-C 241',
+      title: 'Discrete Structures for Computer Science',
+      instructor: 'Prof. Anderson, Karen',
+      credits: 3,
+      gpa_section: 2.6,
+      gpa_student: 2.8,
+      grades_a_percent: 28,
+      building: 'Luddy Hall',
+      room: '0112',
+      time_slots: ['MWF 1:25-2:15'],
+      open_seats: 12,
+      total_seats: 40,
+      level: 200,
+      prereqs: ['MATH-M 211']
+    },
+    // Mathematics Courses
+    {
       code: 'MATH-M 211',
       title: 'Calculus I',
       instructor: 'Prof. Johnson, Sarah',
@@ -442,6 +530,55 @@ const IUCourseMatch = () => {
       level: 200,
       prereqs: ['MATH-M 119 or AP Calculus']
     },
+    {
+      code: 'MATH-M 212',
+      title: 'Calculus II',
+      instructor: 'Dr. Thompson, Robert',
+      credits: 4,
+      gpa_section: 2.7,
+      gpa_student: 2.8,
+      grades_a_percent: 30,
+      building: 'Swain Hall',
+      room: 'SW 318',
+      time_slots: ['MWF 12:20-1:10'],
+      open_seats: 14,
+      total_seats: 32,
+      level: 200,
+      prereqs: ['MATH-M 211 with C or higher']
+    },
+    {
+      code: 'MATH-M 119',
+      title: 'Brief Survey of Calculus',
+      instructor: 'Prof. Lee, Jennifer',
+      credits: 3,
+      gpa_section: 3.1,
+      gpa_student: 2.9,
+      grades_a_percent: 42,
+      building: 'Rawles Hall',
+      room: 'RH 100',
+      time_slots: ['TR 1:00-2:15'],
+      open_seats: 25,
+      total_seats: 45,
+      level: 100,
+      prereqs: ['High school algebra']
+    },
+    {
+      code: 'STAT-S 301',
+      title: 'Applied Statistical Methods for Business',
+      instructor: 'Dr. Patel, Raj',
+      credits: 3,
+      gpa_section: 3.3,
+      gpa_student: 3.0,
+      grades_a_percent: 48,
+      building: 'Kelley School',
+      room: 'BU 200',
+      time_slots: ['TR 4:00-5:15'],
+      open_seats: 20,
+      total_seats: 35,
+      level: 300,
+      prereqs: ['MATH-M 119 or equivalent']
+    },
+    // Informatics Courses
     {
       code: 'INFO-I 101',
       title: 'Introduction to Informatics',
@@ -459,6 +596,39 @@ const IUCourseMatch = () => {
       prereqs: ['None']
     },
     {
+      code: 'INFO-I 210',
+      title: 'Information Infrastructure I',
+      instructor: 'Prof. Garcia, Maria',
+      credits: 4,
+      gpa_section: 3.1,
+      gpa_student: 2.9,
+      grades_a_percent: 44,
+      building: 'Luddy Hall',
+      room: '1106',
+      time_slots: ['MWF 2:30-3:20', 'Lab: R 3:35-5:30'],
+      open_seats: 16,
+      total_seats: 28,
+      level: 200,
+      prereqs: ['INFO-I 101']
+    },
+    {
+      code: 'INFO-I 300',
+      title: 'Human-Computer Interaction',
+      instructor: 'Dr. Kim, Alex',
+      credits: 3,
+      gpa_section: 3.5,
+      gpa_student: 3.1,
+      grades_a_percent: 55,
+      building: 'Luddy Hall',
+      room: '2125',
+      time_slots: ['MWF 11:15-12:05'],
+      open_seats: 12,
+      total_seats: 25,
+      level: 300,
+      prereqs: ['INFO-I 210']
+    },
+    // Business Courses
+    {
       code: 'BUS-A 100',
       title: 'Basic Accounting',
       instructor: 'Prof. Davis, Jennifer',
@@ -475,6 +645,55 @@ const IUCourseMatch = () => {
       prereqs: ['None']
     },
     {
+      code: 'BUS-K 201',
+      title: 'The Computer in Business',
+      instructor: 'Prof. Wilson, David',
+      credits: 3,
+      gpa_section: 3.4,
+      gpa_student: 3.0,
+      grades_a_percent: 52,
+      building: 'Kelley School',
+      room: 'BU 306',
+      time_slots: ['MWF 9:05-9:55'],
+      open_seats: 18,
+      total_seats: 40,
+      level: 200,
+      prereqs: ['Sophomore standing']
+    },
+    {
+      code: 'ECON-E 201',
+      title: 'Introduction to Microeconomics',
+      instructor: 'Dr. Taylor, Susan',
+      credits: 3,
+      gpa_section: 2.9,
+      gpa_student: 2.8,
+      grades_a_percent: 38,
+      building: 'Wylie Hall',
+      room: 'WY 115',
+      time_slots: ['TR 9:30-10:45'],
+      open_seats: 35,
+      total_seats: 60,
+      level: 200,
+      prereqs: ['MATH-M 118 or M 119']
+    },
+    {
+      code: 'ECON-E 202',
+      title: 'Introduction to Macroeconomics',
+      instructor: 'Prof. Jackson, Mark',
+      credits: 3,
+      gpa_section: 3.0,
+      gpa_student: 2.8,
+      grades_a_percent: 40,
+      building: 'Wylie Hall',
+      room: 'WY 200',
+      time_slots: ['MWF 10:10-11:00'],
+      open_seats: 28,
+      total_seats: 55,
+      level: 200,
+      prereqs: ['ECON-E 201']
+    },
+    // English & Writing Courses
+    {
       code: 'ENG-W 131',
       title: 'Elementary Composition',
       instructor: 'Prof. Wilson, Amanda',
@@ -487,6 +706,336 @@ const IUCourseMatch = () => {
       time_slots: ['MWF 1:25-2:15'],
       open_seats: 5,
       total_seats: 20,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'ENG-W 170',
+      title: 'Introduction to Academic Writing',
+      instructor: 'Dr. Martinez, Carlos',
+      credits: 3,
+      gpa_section: 3.2,
+      gpa_student: 2.9,
+      grades_a_percent: 45,
+      building: 'Ballantine Hall',
+      room: 'BH 242',
+      time_slots: ['TR 11:15-12:30'],
+      open_seats: 8,
+      total_seats: 22,
+      level: 100,
+      prereqs: ['None']
+    },
+    // Psychology
+    {
+      code: 'PSY-P 101',
+      title: 'Introduction to Psychology',
+      instructor: 'Dr. Foster, Rachel',
+      credits: 3,
+      gpa_section: 3.3,
+      gpa_student: 3.0,
+      grades_a_percent: 50,
+      building: 'Psychology Building',
+      room: 'PY 101',
+      time_slots: ['MWF 11:15-12:05'],
+      open_seats: 45,
+      total_seats: 75,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'PSY-P 211',
+      title: 'Research Methods in Psychology',
+      instructor: 'Prof. Chang, Wei',
+      credits: 4,
+      gpa_section: 2.8,
+      gpa_student: 3.0,
+      grades_a_percent: 35,
+      building: 'Psychology Building',
+      room: 'PY 105',
+      time_slots: ['TR 2:30-3:45', 'Lab: W 1:25-3:20'],
+      open_seats: 12,
+      total_seats: 30,
+      level: 200,
+      prereqs: ['PSY-P 101', 'STAT course']
+    },
+    // Biology
+    {
+      code: 'BIOL-L 111',
+      title: 'Evolution and Diversity',
+      instructor: 'Dr. Green, Patricia',
+      credits: 5,
+      gpa_section: 2.7,
+      gpa_student: 2.9,
+      grades_a_percent: 30,
+      building: 'Jordan Hall',
+      room: 'JH A100',
+      time_slots: ['MWF 9:05-9:55', 'Lab: T 8:00-10:55'],
+      open_seats: 8,
+      total_seats: 48,
+      level: 100,
+      prereqs: ['High school biology']
+    },
+    {
+      code: 'BIOL-L 113',
+      title: 'Molecular Biology and Biochemistry',
+      instructor: 'Prof. White, Steven',
+      credits: 5,
+      gpa_section: 2.6,
+      gpa_student: 2.8,
+      grades_a_percent: 28,
+      building: 'Jordan Hall',
+      room: 'JH A100',
+      time_slots: ['MWF 1:25-2:15', 'Lab: R 2:30-5:25'],
+      open_seats: 15,
+      total_seats: 45,
+      level: 100,
+      prereqs: ['BIOL-L 111', 'CHEM-C 117']
+    },
+    // Chemistry
+    {
+      code: 'CHEM-C 105',
+      title: 'Principles of Chemistry I',
+      instructor: 'Dr. Adams, Frank',
+      credits: 3,
+      gpa_section: 2.5,
+      gpa_student: 2.7,
+      grades_a_percent: 25,
+      building: 'Chemistry Building',
+      room: 'CH 001',
+      time_slots: ['MWF 8:00-8:50'],
+      open_seats: 22,
+      total_seats: 50,
+      level: 100,
+      prereqs: ['High school chemistry']
+    },
+    {
+      code: 'CHEM-C 125',
+      title: 'Experimental Chemistry I',
+      instructor: 'Dr. Brown, Nancy',
+      credits: 2,
+      gpa_section: 3.2,
+      gpa_student: 2.8,
+      grades_a_percent: 55,
+      building: 'Chemistry Building',
+      room: 'CH 015',
+      time_slots: ['T 8:00-11:55'],
+      open_seats: 16,
+      total_seats: 24,
+      level: 100,
+      prereqs: ['CHEM-C 105 (concurrent)']
+    },
+    // Physics
+    {
+      code: 'PHYS-P 201',
+      title: 'General Physics I',
+      instructor: 'Prof. Kumar, Amit',
+      credits: 5,
+      gpa_section: 2.8,
+      gpa_student: 2.9,
+      grades_a_percent: 33,
+      building: 'Swain Hall',
+      room: 'SW 100',
+      time_slots: ['MTWRF 10:10-11:00'],
+      open_seats: 20,
+      total_seats: 45,
+      level: 200,
+      prereqs: ['MATH-M 211 (concurrent)']
+    },
+    {
+      code: 'PHYS-P 221',
+      title: 'Physics I with Calculus',
+      instructor: 'Dr. Liu, Ming',
+      credits: 5,
+      gpa_section: 2.6,
+      gpa_student: 2.8,
+      grades_a_percent: 27,
+      building: 'Swain Hall',
+      room: 'SW 100',
+      time_slots: ['MTWRF 11:15-12:05'],
+      open_seats: 18,
+      total_seats: 40,
+      level: 200,
+      prereqs: ['MATH-M 211']
+    },
+    // History
+    {
+      code: 'HIST-H 105',
+      title: 'American History I',
+      instructor: 'Prof. Miller, James',
+      credits: 3,
+      gpa_section: 3.2,
+      gpa_student: 2.9,
+      grades_a_percent: 46,
+      building: 'Ballantine Hall',
+      room: 'BH 006',
+      time_slots: ['MWF 2:30-3:20'],
+      open_seats: 30,
+      total_seats: 50,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'HIST-H 106',
+      title: 'American History II',
+      instructor: 'Dr. Davis, Linda',
+      credits: 3,
+      gpa_section: 3.1,
+      gpa_student: 2.9,
+      grades_a_percent: 44,
+      building: 'Ballantine Hall',
+      room: 'BH 006',
+      time_slots: ['MWF 3:35-4:25'],
+      open_seats: 28,
+      total_seats: 50,
+      level: 100,
+      prereqs: ['HIST-H 105 recommended']
+    },
+    // Foreign Languages
+    {
+      code: 'FREN-F 100',
+      title: 'Elementary French I',
+      instructor: 'Prof. Dubois, Marie',
+      credits: 4,
+      gpa_section: 3.3,
+      gpa_student: 3.0,
+      grades_a_percent: 52,
+      building: 'Ballantine Hall',
+      room: 'BH 336',
+      time_slots: ['MTWRF 9:05-9:55'],
+      open_seats: 8,
+      total_seats: 20,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'HISP-S 100',
+      title: 'Elementary Spanish I',
+      instructor: 'Prof. Rodriguez, Ana',
+      credits: 4,
+      gpa_section: 3.4,
+      gpa_student: 3.0,
+      grades_a_percent: 58,
+      building: 'Ballantine Hall',
+      room: 'BH 245',
+      time_slots: ['MTWRF 10:10-11:00'],
+      open_seats: 5,
+      total_seats: 22,
+      level: 100,
+      prereqs: ['None']
+    },
+    // Engineering
+    {
+      code: 'ENGR-E 101',
+      title: 'Introduction to Engineering I',
+      instructor: 'Dr. Peterson, Erik',
+      credits: 3,
+      gpa_section: 3.0,
+      gpa_student: 2.8,
+      grades_a_percent: 41,
+      building: 'Luddy Hall',
+      room: '0112',
+      time_slots: ['TR 1:00-2:15'],
+      open_seats: 25,
+      total_seats: 40,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'ENGR-E 111',
+      title: 'Fundamentals of Engineering Problem Solving',
+      instructor: 'Prof. Hansen, Greg',
+      credits: 3,
+      gpa_section: 2.9,
+      gpa_student: 2.8,
+      grades_a_percent: 38,
+      building: 'Luddy Hall',
+      room: '1106',
+      time_slots: ['MWF 8:00-8:50'],
+      open_seats: 20,
+      total_seats: 35,
+      level: 100,
+      prereqs: ['MATH-M 119 (concurrent)']
+    },
+    // Art & Humanities
+    {
+      code: 'ARTH-A 100',
+      title: 'Introduction to Art',
+      instructor: 'Prof. Romano, Isabella',
+      credits: 3,
+      gpa_section: 3.5,
+      gpa_student: 3.1,
+      grades_a_percent: 62,
+      building: 'Fine Arts Building',
+      room: 'FA 101',
+      time_slots: ['TR 2:30-3:45'],
+      open_seats: 15,
+      total_seats: 30,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'MUS-T 109',
+      title: 'Basic Music Theory',
+      instructor: 'Dr. Symphony, Johann',
+      credits: 3,
+      gpa_section: 3.2,
+      gpa_student: 2.9,
+      grades_a_percent: 47,
+      building: 'Musical Arts Center',
+      room: 'MA 005',
+      time_slots: ['MWF 1:25-2:15'],
+      open_seats: 12,
+      total_seats: 25,
+      level: 100,
+      prereqs: ['Music placement exam or audition']
+    },
+    // Geography & Environment
+    {
+      code: 'GEOG-G 110',
+      title: 'Introduction to Human Geography',
+      instructor: 'Prof. Rivers, Jordan',
+      credits: 3,
+      gpa_section: 3.6,
+      gpa_student: 3.1,
+      grades_a_percent: 65,
+      building: 'Student Building',
+      room: 'SB 220',
+      time_slots: ['TR 11:15-12:30'],
+      open_seats: 40,
+      total_seats: 65,
+      level: 100,
+      prereqs: ['None']
+    },
+    {
+      code: 'GEOL-G 107',
+      title: 'Environmental Earth Science',
+      instructor: 'Dr. Stone, Peter',
+      credits: 3,
+      gpa_section: 3.1,
+      gpa_student: 2.9,
+      grades_a_percent: 43,
+      building: 'Geology Building',
+      room: 'GY 100',
+      time_slots: ['MWF 12:20-1:10'],
+      open_seats: 22,
+      total_seats: 35,
+      level: 100,
+      prereqs: ['None']
+    },
+    // Political Science
+    {
+      code: 'POLS-Y 103',
+      title: 'Introduction to American Politics',
+      instructor: 'Prof. Liberty, John',
+      credits: 3,
+      gpa_section: 3.2,
+      gpa_student: 3.0,
+      grades_a_percent: 48,
+      building: 'Woodburn Hall',
+      room: 'WB 120',
+      time_slots: ['TR 1:00-2:15'],
+      open_seats: 25,
+      total_seats: 45,
       level: 100,
       prereqs: ['None']
     }
@@ -800,50 +1349,168 @@ const IUCourseMatch = () => {
           background: '#f9fafb',
           padding: '24px',
           borderRadius: '16px',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #e5e7eb',
+          maxHeight: '400px',
+          overflowY: 'auto'
         }}>
           <h4 style={{ fontWeight: '600', color: '#1f2937', marginBottom: '16px' }}>
             AP Credits (Optional)
           </h4>
-          <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
-            Select any AP exams you've taken:
-          </p>
-          <div style={{ maxHeight: '200px', overflowY: 'auto', padding: '8px' }}>
-            {['Calculus AB', 'Calculus BC', 'Computer Science A', 'English Language', 'Psychology', 'Statistics'].map(exam => (
-              <div key={exam} style={{
-                display: 'flex',
-                alignItems: 'center',
-                margin: '12px 0',
-                cursor: 'pointer',
-                padding: '12px',
-                borderRadius: '8px',
-                transition: 'background-color 0.2s ease',
-                border: '1px solid transparent'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#f3f4f6';
-                e.currentTarget.style.borderColor = '#d1d5db';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'transparent';
-              }}
-              >
-                <input 
-                  type="checkbox" 
-                  style={{ 
-                    marginRight: '12px', 
-                    width: '18px', 
-                    height: '18px',
-                    accentColor: '#990000',
-                    cursor: 'pointer'
-                  }} 
-                />
-                <span style={{ fontSize: '15px', color: '#374151', fontWeight: '500' }}>
-                  {exam}
-                </span>
-              </div>
-            ))}
+          
+          {/* Score 5 Section */}
+          <div style={{ marginBottom: '20px' }}>
+            <h5 style={{ 
+              fontSize: '16px', 
+              fontWeight: '600', 
+              color: '#059669', 
+              marginBottom: '12px',
+              padding: '8px 12px',
+              background: '#ecfdf5',
+              borderRadius: '8px',
+              border: '1px solid #a7f3d0'
+            }}>
+              Score of 5 (Maximum Credit)
+            </h5>
+            <div style={{ paddingLeft: '12px' }}>
+              {Object.entries(AP_EXAMS_FULL).map(([exam, scores]) => (
+                <div key={`5-${exam}`} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  margin: '8px 0',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#f0fdf4'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <input 
+                    type="checkbox" 
+                    style={{ 
+                      marginRight: '12px', 
+                      marginTop: '2px',
+                      width: '16px', 
+                      height: '16px',
+                      accentColor: '#059669',
+                      cursor: 'pointer'
+                    }} 
+                  />
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                      {exam}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      Credit: {scores[5]}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Score 4 Section */}
+          <div style={{ marginBottom: '20px' }}>
+            <h5 style={{ 
+              fontSize: '16px', 
+              fontWeight: '600', 
+              color: '#0891b2', 
+              marginBottom: '12px',
+              padding: '8px 12px',
+              background: '#ecfeff',
+              borderRadius: '8px',
+              border: '1px solid #67e8f9'
+            }}>
+              Score of 4 (Good Credit)
+            </h5>
+            <div style={{ paddingLeft: '12px' }}>
+              {Object.entries(AP_EXAMS_FULL).map(([exam, scores]) => (
+                <div key={`4-${exam}`} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  margin: '8px 0',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#f0fdff'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <input 
+                    type="checkbox" 
+                    style={{ 
+                      marginRight: '12px', 
+                      marginTop: '2px',
+                      width: '16px', 
+                      height: '16px',
+                      accentColor: '#0891b2',
+                      cursor: 'pointer'
+                    }} 
+                  />
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                      {exam}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      Credit: {scores[4]}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Score 3 Section */}
+          <div style={{ marginBottom: '8px' }}>
+            <h5 style={{ 
+              fontSize: '16px', 
+              fontWeight: '600', 
+              color: '#d97706', 
+              marginBottom: '12px',
+              padding: '8px 12px',
+              background: '#fffbeb',
+              borderRadius: '8px',
+              border: '1px solid #fed7aa'
+            }}>
+              Score of 3 (Basic Credit)
+            </h5>
+            <div style={{ paddingLeft: '12px' }}>
+              {Object.entries(AP_EXAMS_FULL).map(([exam, scores]) => (
+                <div key={`3-${exam}`} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  margin: '8px 0',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#fefce8'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <input 
+                    type="checkbox" 
+                    style={{ 
+                      marginRight: '12px', 
+                      marginTop: '2px',
+                      width: '16px', 
+                      height: '16px',
+                      accentColor: '#d97706',
+                      cursor: 'pointer'
+                    }} 
+                  />
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+                      {exam}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      Credit: {scores[3]}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
